@@ -36,6 +36,7 @@ Opcodes:
 import struct
 from enum import IntEnum
 
+
 # ── Opcodes ──────────────────────────────────────────────────────────────────
 class Op(IntEnum):
     MOVE   = 0x01
@@ -93,9 +94,9 @@ AM_NAMES = {v: k for k, v in AM.__members__.items()}
 def reg_num(name: str) -> int:
     """D0-D7 → 0-7,  A0-A7 → 8-15"""
     name = name.upper()
-    if name.startswith('D'):
+    if name.startswith("D"):
         return int(name[1:])
-    if name.startswith('A'):
+    if name.startswith("A"):
         return 8 + int(name[1:])
     raise ValueError(f"Unknown register: {name}")
 
@@ -156,25 +157,25 @@ def encode_instr(opcode: Op, src: Operand, dst: Operand,
         (dst.reg           <<  8) |
         ((1 if size_byte else 0) << 7)
     )
-    parts = [struct.pack('>I', word0)]
+    parts = [struct.pack(">I", word0)]
     for w in src.extra_words():
-        parts.append(struct.pack('>I', w & 0xFFFFFFFF))
+        parts.append(struct.pack(">I", w & 0xFFFFFFFF))
     for w in dst.extra_words():
-        parts.append(struct.pack('>I', w & 0xFFFFFFFF))
-    return b''.join(parts)
+        parts.append(struct.pack(">I", w & 0xFFFFFFFF))
+    return b"".join(parts)
 
 def encode_branch(opcode: Op, target_addr: int) -> bytes:
     """Branch/jmp/jsr: base word + 4-byte absolute target."""
     word0 = (int(opcode) << 24) | (int(AM.IMMED) << 20) | (int(AM.NONE) << 16)
-    return struct.pack('>II', word0, target_addr & 0xFFFFFFFF)
+    return struct.pack(">II", word0, target_addr & 0xFFFFFFFF)
 
 def encode_halt() -> bytes:
     word0 = (int(Op.HALT) << 24) | (int(AM.NONE) << 20) | (int(AM.NONE) << 16)
-    return struct.pack('>I', word0)
+    return struct.pack(">I", word0)
 
 def encode_rts() -> bytes:
     word0 = (int(Op.RTS) << 24) | (int(AM.NONE) << 20) | (int(AM.NONE) << 16)
-    return struct.pack('>I', word0)
+    return struct.pack(">I", word0)
 
 def encode_link(areg: int, disp: int) -> bytes:
     """link An, #disp"""
@@ -194,20 +195,20 @@ def decode_instr(data: bytes, offset: int):
     """
     if offset + 4 > len(data):
         return "???", 1
-    word0 = struct.unpack_from('>I', data, offset)[0]
+    word0 = struct.unpack_from(">I", data, offset)[0]
     opcode   = (word0 >> 24) & 0xFF
     src_mode = AM((word0 >> 20) & 0xF)
     dst_mode = AM((word0 >> 16) & 0xF)
     src_reg  = (word0 >> 12) & 0xF
     dst_reg  = (word0 >>  8) & 0xF
     size_b   = bool((word0 >> 7) & 1)
-    sz       = '.b' if size_b else '.l'
+    sz       = ".b" if size_b else ".l"
 
     cursor = offset + 4
 
     def read_word():
         nonlocal cursor
-        v = struct.unpack_from('>I', data, cursor)[0]
+        v = struct.unpack_from(">I", data, cursor)[0]
         cursor += 4
         return v
 
@@ -217,11 +218,11 @@ def decode_instr(data: bytes, offset: int):
             val = read_word()
             return f"#{val}", val
         if mode == AM.MEM_DISP:
-            d = struct.unpack_from('>i', data, cursor)[0]
+            d = struct.unpack_from(">i", data, cursor)[0]
             cursor += 4
             return f"{d}({reg_name(reg)})", d
         if mode == AM.MEM_IDX:
-            d   = struct.unpack_from('>i', data, cursor)[0]; cursor += 4
+            d   = struct.unpack_from(">i", data, cursor)[0]; cursor += 4
             ir  = read_word()
             return f"{d}({reg_name(reg)},{reg_name(ir)})", d
         if mode == AM.NONE:
@@ -273,6 +274,6 @@ def disassemble(code: bytes, base=0) -> list[tuple[int,str,str]]:
 
 def write_debug(code: bytes, path: str, base=0):
     rows = disassemble(code, base)
-    with open(path, 'w') as f:
+    with open(path, "w") as f:
         for addr, hx, mn in rows:
             f.write(f"{addr} - {hx} - {mn}\n")

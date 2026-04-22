@@ -36,14 +36,26 @@ Memory-mapped IO (в памяти ДАННЫХ):
     read_line(A0, D0)   — читает строку в буфер; возвращает длину в D0
 """
 
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.dirname(__file__))
 
 import struct
-from isa import (Op, AM, Operand, NONE_OP, reg_num,
-                 encode_instr, encode_branch, encode_halt,
-                 encode_rts, encode_link, encode_unlk,
-                 write_debug)
+
+from isa import (
+    AM,
+    Op,
+    Operand,
+    encode_branch,
+    encode_halt,
+    encode_instr,
+    encode_link,
+    encode_rts,
+    encode_unlk,
+    write_debug,
+)
+
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 def D(n): return Operand(AM.REG_D, reg=n)
@@ -65,7 +77,7 @@ def ei(op, src, dst, sz=False):
 def pascal_str(s):
     words = [len(s)]
     words += [ord(c) for c in s]
-    return struct.pack(f'>{len(words)}I', *words)
+    return struct.pack(f">{len(words)}I", *words)
 
 STR_PROMPT   = "What is your name?\n"     # @ 0x0000
 STR_HELLO    = "Hello, "                  # @ 0x0054
@@ -77,7 +89,7 @@ def build_data_segment():
 
     def align4(b):
         while len(b) % 4:
-            b += b'\x00'
+            b += b"\x00"
 
     offsets = {}
 
@@ -85,14 +97,14 @@ def build_data_segment():
         offsets[name] = len(data)
         data.extend(pascal_str(s))
 
-    add('prompt',   STR_PROMPT)    # "What is your name?\n"
-    add('hello',    STR_HELLO)     # "Hello, "
-    add('excl',     STR_EXCL)      # "!\n"
-    add('stranger', STR_STRANGER)  # "Hello, stranger!\n"
+    add("prompt",   STR_PROMPT)    # "What is your name?\n"
+    add("hello",    STR_HELLO)     # "Hello, "
+    add("excl",     STR_EXCL)      # "!\n"
+    add("stranger", STR_STRANGER)  # "Hello, stranger!\n"
 
     # name_buf: 1 слово длины + 64 слова символов = 65*4 = 260 bytes
-    offsets['name_buf'] = len(data)
-    data.extend(b'\x00' * 65 * 4)
+    offsets["name_buf"] = len(data)
+    data.extend(b"\x00" * 65 * 4)
 
     return bytes(data), offsets
 
@@ -173,7 +185,7 @@ class Assembler:
     def fixup(self):
         for off, name in self.fixups:
             target = self.labels[name]
-            struct.pack_into('>I', self.code, off, target)
+            struct.pack_into(">I", self.code, off, target)
 
     def assemble(self):
         self.fixup()
@@ -197,7 +209,7 @@ def assemble_hello():
     # A0 → Pascal-строка
     # Использует D1 (counter), D2 (char), A1 (current ptr)
     # Сохраняет A0 через A1 для обхода строки
-    asm.label('print_str')
+    asm.label("print_str")
     asm.emit_link(6, -16)                        # link A6, -16  (save D1,D2,A1)
     # сохранить регистры
     asm.emit_move(D(1), Disp(6, -4))
@@ -208,9 +220,9 @@ def assemble_hello():
     # D2 = 0 (counter i)
     asm.emit_move(Imm(0), D(2))
 
-    asm.label('print_str_loop')
+    asm.label("print_str_loop")
     asm.emit_cmp(D(1), D(2))                     # cmp D1, D2  → D2-D1
-    asm.emit_branch(Op.BGE, 'print_str_done')    # if i >= len: done
+    asm.emit_branch(Op.BGE, "print_str_done")    # if i >= len: done
 
     # read char from string
     asm.emit_move(Post(1), D(0))                 # D0 = mem[A1]; A1+=4
@@ -220,9 +232,9 @@ def assemble_hello():
     asm.emit_move(D(0), Ind(5))                  # mem[A5] = D0
 
     asm.emit_add(Imm(1), D(2))                   # i++
-    asm.emit_jmp('print_str_loop')
+    asm.emit_jmp("print_str_loop")
 
-    asm.label('print_str_done')
+    asm.label("print_str_done")
     asm.emit_move(Disp(6, -4), D(1))             # restore D1
     asm.emit_move(Disp(6, -8), D(2))             # restore D2
     asm.emit_unlk(6)
@@ -232,7 +244,7 @@ def assemble_hello():
     # A0 → буфер (слово длины + символы)
     # Читает до '\n' или EOF, пишет длину в слово[0]
     # Портит: D1(i), D2(char), A1(ptr), A5(IO)
-    asm.label('read_line')
+    asm.label("read_line")
     asm.emit_link(6, -16)
     asm.emit_move(D(1), Disp(6, -4))
     asm.emit_move(D(2), Disp(6, -8))
@@ -240,9 +252,9 @@ def assemble_hello():
     asm.emit_add(Imm(4), A(1))                   # A1 += 4 (skip length word, point to chars)
     asm.emit_move(Imm(0), D(1))                  # i = 0
 
-    asm.label('read_line_loop')
+    asm.label("read_line_loop")
     asm.emit_cmp(Imm(64), D(1))                  # i < 64?
-    asm.emit_branch(Op.BGE, 'read_line_store')
+    asm.emit_branch(Op.BGE, "read_line_store")
 
     # read char from IO
     asm.emit_movea(Imm(IO_IN), 5)
@@ -250,18 +262,18 @@ def assemble_hello():
 
     # check EOF (-1 = 0xFFFFFFFF)
     asm.emit_cmp(Imm(0xFFFFFFFF), D(2))
-    asm.emit_branch(Op.BEQ, 'read_line_store')
+    asm.emit_branch(Op.BEQ, "read_line_store")
 
     # check '\n' (10)
     asm.emit_cmp(Imm(10), D(2))
-    asm.emit_branch(Op.BEQ, 'read_line_store')
+    asm.emit_branch(Op.BEQ, "read_line_store")
 
     # store char
     asm.emit_move(D(2), Post(1))                 # mem[A1]=D2; A1+=4
     asm.emit_add(Imm(1), D(1))                   # i++
-    asm.emit_jmp('read_line_loop')
+    asm.emit_jmp("read_line_loop")
 
-    asm.label('read_line_store')
+    asm.label("read_line_store")
     # write length word to buf[0]
     asm.emit_move(D(1), Ind(0))                  # mem[A0] = i
     asm.emit_move(D(1), D(0))                    # return value = i
@@ -272,73 +284,73 @@ def assemble_hello():
     asm.emit_rts()
 
     # ── main ───────────────────────────────────────────────────────────────
-    asm.label('main')
+    asm.label("main")
     asm.emit_link(6, 0)
 
     # print_str("What is your name?\n")
-    asm.emit_movea(Imm(DATA_OFF['prompt']), 0)
-    asm.emit_jsr('print_str')
+    asm.emit_movea(Imm(DATA_OFF["prompt"]), 0)
+    asm.emit_jsr("print_str")
 
     # read_line(name_buf)
-    asm.emit_movea(Imm(DATA_OFF['name_buf']), 0)
-    asm.emit_jsr('read_line')
+    asm.emit_movea(Imm(DATA_OFF["name_buf"]), 0)
+    asm.emit_jsr("read_line")
 
     # if D0 == 0: stranger branch
     asm.emit_cmp(Imm(0), D(0))
-    asm.emit_branch(Op.BEQ, 'say_stranger')
+    asm.emit_branch(Op.BEQ, "say_stranger")
 
     # print "Hello, "
-    asm.emit_movea(Imm(DATA_OFF['hello']), 0)
-    asm.emit_jsr('print_str')
+    asm.emit_movea(Imm(DATA_OFF["hello"]), 0)
+    asm.emit_jsr("print_str")
 
     # print name_buf
-    asm.emit_movea(Imm(DATA_OFF['name_buf']), 0)
-    asm.emit_jsr('print_str')
+    asm.emit_movea(Imm(DATA_OFF["name_buf"]), 0)
+    asm.emit_jsr("print_str")
 
     # print "!\n"
-    asm.emit_movea(Imm(DATA_OFF['excl']), 0)
-    asm.emit_jsr('print_str')
-    asm.emit_jmp('main_done')
+    asm.emit_movea(Imm(DATA_OFF["excl"]), 0)
+    asm.emit_jsr("print_str")
+    asm.emit_jmp("main_done")
 
-    asm.label('say_stranger')
-    asm.emit_movea(Imm(DATA_OFF['stranger']), 0)
-    asm.emit_jsr('print_str')
+    asm.label("say_stranger")
+    asm.emit_movea(Imm(DATA_OFF["stranger"]), 0)
+    asm.emit_jsr("print_str")
 
-    asm.label('main_done')
+    asm.label("main_done")
     asm.emit_unlk(6)
     asm.emit_halt()
 
     return asm.assemble(), asm.labels
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import os
-    out_dir = os.path.join(os.path.dirname(__file__), '..', 'debug')
+    out_dir = os.path.join(os.path.dirname(__file__), "..", "debug")
     os.makedirs(out_dir, exist_ok=True)
 
     code, labels = assemble_hello()
 
     # binary code image
-    with open(os.path.join(out_dir, 'hello_user_name.bin'), 'wb') as f:
+    with open(os.path.join(out_dir, "hello_user_name.bin"), "wb") as f:
         f.write(code)
 
     # binary data image
-    with open(os.path.join(out_dir, 'hello_user_name.data.bin'), 'wb') as f:
+    with open(os.path.join(out_dir, "hello_user_name.data.bin"), "wb") as f:
         f.write(DATA)
 
     # debug listing
-    write_debug(code, os.path.join(out_dir, 'hello_user_name.lst'))
+    write_debug(code, os.path.join(out_dir, "hello_user_name.lst"))
 
     # labels map
-    with open(os.path.join(out_dir, 'hello_user_name.labels'), 'w') as f:
+    with open(os.path.join(out_dir, "hello_user_name.labels"), "w") as f:
         for name, addr in sorted(labels.items(), key=lambda x: x[1]):
             f.write(f"{addr:6d}  {name}\n")
 
     print("=== hello_user_name assembled ===")
     print(f"Code size : {len(code)} bytes")
     print(f"Data size : {len(DATA)} bytes")
-    print(f"\nLabels:")
+    print("\nLabels:")
     for name, addr in sorted(labels.items(), key=lambda x: x[1]):
         print(f"  {addr:4d}  {name}")
-    print(f"\nData offsets:")
+    print("\nData offsets:")
     for k, v in DATA_OFF.items():
         print(f"  0x{v:04X}  {k}")

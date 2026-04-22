@@ -23,14 +23,26 @@ sort.asm  — ассемблерная программа «сортировка
   A7 — stack pointer
 """
 
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.dirname(__file__))
 
 import struct
-from isa import (Op, AM, Operand, NONE_OP, reg_num,
-                 encode_instr, encode_branch, encode_halt,
-                 encode_rts, encode_link, encode_unlk,
-                 write_debug)
+
+from isa import (
+    AM,
+    Op,
+    Operand,
+    encode_branch,
+    encode_halt,
+    encode_instr,
+    encode_link,
+    encode_rts,
+    encode_unlk,
+    write_debug,
+)
+
 
 def D(n): return Operand(AM.REG_D, reg=n)
 def A(n): return Operand(AM.REG_A, reg=8+n)
@@ -50,7 +62,7 @@ def ei(op, src, dst, sz=False):
 def pascal_str(s):
     words = [len(s)]
     words += [ord(c) for c in s]
-    return struct.pack(f'>{len(words)}I', *words)
+    return struct.pack(f">{len(words)}I", *words)
 
 def build_data():
     data = bytearray()
@@ -58,14 +70,14 @@ def build_data():
     def add(name, s):
         offsets[name] = len(data)
         data.extend(pascal_str(s))
-    add('str_sorted', "Sorted: ")
-    add('str_sum',    "Sum: ")
-    add('str_avg',    "Avg: ")
-    add('str_nl',     "\n")
-    add('str_sp',     " ")
+    add("str_sorted", "Sorted: ")
+    add("str_sum",    "Sum: ")
+    add("str_avg",    "Avg: ")
+    add("str_nl",     "\n")
+    add("str_sp",     " ")
     # arr: 64 элемента * 4 байта = 256 байт
-    offsets['arr'] = len(data)
-    data.extend(b'\x00' * 64 * 4)
+    offsets["arr"] = len(data)
+    data.extend(b"\x00" * 64 * 4)
     return bytes(data), offsets
 
 DATA, DATA_OFF = build_data()
@@ -116,7 +128,7 @@ class Assembler:
 
     def fixup(self):
         for off, name in self.fixups:
-            struct.pack_into('>I', self.code, off, self.labels[name])
+            struct.pack_into(">I", self.code, off, self.labels[name])
 
     def assemble(self):
         self.fixup()
@@ -127,7 +139,7 @@ def assemble_sort():
 
     # ── write_char(D0) ────────────────────────────────────────────────────
     # Записывает один символ из D0 в IO_OUT.
-    asm.label('write_char')
+    asm.label("write_char")
     asm.emit_movea(Imm(IO_OUT), 5)
     asm.emit_move(D(0), Ind(5))
     asm.emit_rts()
@@ -140,7 +152,7 @@ def assemble_sort():
     #   4. Применить знак
     # Регистры: D0=result, D1=char, D2=negative_flag
     # Сохраняем через стек (link/unlk)
-    asm.label('read_int')
+    asm.label("read_int")
     asm.emit_link(6, -16)
     asm.emit_move(D(1), Disp(6, -4))
     asm.emit_move(D(2), Disp(6, -8))
@@ -150,32 +162,32 @@ def assemble_sort():
     asm.emit_move(Imm(0), D(2))        # negative = false
 
     # skip whitespace
-    asm.label('read_int_skip')
+    asm.label("read_int_skip")
     asm.emit_movea(Imm(IO_IN), 5)
     asm.emit_move(Ind(5), D(1))         # D1 = char
     # cmp ' '
     asm.emit_cmp(Imm(32), D(1))
-    asm.emit_branch(Op.BEQ, 'read_int_skip')
+    asm.emit_branch(Op.BEQ, "read_int_skip")
     # cmp '\n'
     asm.emit_cmp(Imm(10), D(1))
-    asm.emit_branch(Op.BEQ, 'read_int_skip')
+    asm.emit_branch(Op.BEQ, "read_int_skip")
     # cmp '\r'
     asm.emit_cmp(Imm(13), D(1))
-    asm.emit_branch(Op.BEQ, 'read_int_skip')
+    asm.emit_branch(Op.BEQ, "read_int_skip")
 
     # check '-'
     asm.emit_cmp(Imm(45), D(1))         # '-'
-    asm.emit_branch(Op.BNE, 'read_int_digits')
+    asm.emit_branch(Op.BNE, "read_int_digits")
     asm.emit_move(Imm(1), D(2))         # negative = true
     asm.emit_movea(Imm(IO_IN), 5)
     asm.emit_move(Ind(5), D(1))         # read next char
 
-    asm.label('read_int_digits')
+    asm.label("read_int_digits")
     # while '0' <= D1 <= '9'
     asm.emit_cmp(Imm(48), D(1))         # D1 - 48
-    asm.emit_branch(Op.BLT, 'read_int_done')
+    asm.emit_branch(Op.BLT, "read_int_done")
     asm.emit_cmp(Imm(57), D(1))
-    asm.emit_branch(Op.BGT, 'read_int_done')
+    asm.emit_branch(Op.BGT, "read_int_done")
 
     # result = result * 10 + (D1 - 48)
     asm.emit_mul(Imm(10), D(0))
@@ -184,17 +196,17 @@ def assemble_sort():
 
     asm.emit_movea(Imm(IO_IN), 5)
     asm.emit_move(Ind(5), D(1))
-    asm.emit_jmp('read_int_digits')
+    asm.emit_jmp("read_int_digits")
 
-    asm.label('read_int_done')
+    asm.label("read_int_done")
     # if negative: D0 = 0 - D0
     asm.emit_cmp(Imm(0), D(2))
-    asm.emit_branch(Op.BEQ, 'read_int_ret')
+    asm.emit_branch(Op.BEQ, "read_int_ret")
     asm.emit_move(Imm(0), D(3))
     asm.emit_sub(D(0), D(3))
     asm.emit_move(D(3), D(0))
 
-    asm.label('read_int_ret')
+    asm.label("read_int_ret")
     asm.emit_move(Disp(6, -4),  D(1))
     asm.emit_move(Disp(6, -8),  D(2))
     asm.emit_move(Disp(6, -12), D(3))
@@ -204,39 +216,39 @@ def assemble_sort():
     # ── write_int(D0) ─────────────────────────────────────────────────────
     # Рекурсивный вывод цифр.
     # Сохраняем D0 через стек (link).
-    asm.label('write_int')
+    asm.label("write_int")
     asm.emit_link(6, -8)
     asm.emit_move(D(0), Disp(6, -4))
     asm.emit_move(D(1), Disp(6, -8))
 
     # if D0 < 0: print '-'; D0 = -D0
     asm.emit_cmp(Imm(0), D(0))
-    asm.emit_branch(Op.BGE, 'write_int_pos')
+    asm.emit_branch(Op.BGE, "write_int_pos")
     asm.emit_move(Imm(45), D(0))        # '-'
-    asm.emit_jsr('write_char')
+    asm.emit_jsr("write_char")
     asm.emit_move(Disp(6, -4), D(0))   # restore D0
     asm.emit_move(Imm(0), D(1))
     asm.emit_sub(D(0), D(1))
     asm.emit_move(D(1), D(0))
     asm.emit_move(D(0), Disp(6, -4))   # save updated D0
 
-    asm.label('write_int_pos')
+    asm.label("write_int_pos")
     # if D0 == 0: print '0'; return
     asm.emit_cmp(Imm(0), D(0))
-    asm.emit_branch(Op.BNE, 'write_int_nonzero')
+    asm.emit_branch(Op.BNE, "write_int_nonzero")
     asm.emit_move(Imm(48), D(0))
-    asm.emit_jsr('write_char')
-    asm.emit_jmp('write_int_done')
+    asm.emit_jsr("write_char")
+    asm.emit_jmp("write_int_done")
 
-    asm.label('write_int_nonzero')
+    asm.label("write_int_nonzero")
     # if D0 >= 10: recurse with D0/10
     asm.emit_cmp(Imm(10), D(0))
-    asm.emit_branch(Op.BLT, 'write_int_digit')
+    asm.emit_branch(Op.BLT, "write_int_digit")
     asm.emit_move(D(0), D(1))
     asm.emit_div(Imm(10), D(1))
     # save remainder: D0 % 10 = D0 - (D0/10)*10
     asm.emit_move(D(1), D(0))          # D0 = quotient
-    asm.emit_jsr('write_int')          # recurse
+    asm.emit_jsr("write_int")          # recurse
     asm.emit_move(Disp(6, -4), D(0))  # restore original D0
 
     # compute D0 % 10
@@ -245,11 +257,11 @@ def assemble_sort():
     asm.emit_mul(Imm(10), D(1))
     asm.emit_sub(D(1), D(0))          # D0 = D0 - (D0/10)*10
 
-    asm.label('write_int_digit')
+    asm.label("write_int_digit")
     asm.emit_add(Imm(48), D(0))        # '0' + digit
-    asm.emit_jsr('write_char')
+    asm.emit_jsr("write_char")
 
-    asm.label('write_int_done')
+    asm.label("write_int_done")
     asm.emit_move(Disp(6, -4), D(0))
     asm.emit_move(Disp(6, -8), D(1))
     asm.emit_unlk(6)
@@ -257,7 +269,7 @@ def assemble_sort():
 
     # ── print_pascal_str(A0) ──────────────────────────────────────────────
     # Печатает Pascal-строку на которую указывает A0
-    asm.label('print_str')
+    asm.label("print_str")
     asm.emit_link(6, -16)
     asm.emit_move(D(1), Disp(6, -4))
     asm.emit_move(D(2), Disp(6, -8))
@@ -265,15 +277,15 @@ def assemble_sort():
     asm.emit_move(Post(1), D(1))       # D1 = length; A1 += 4
     asm.emit_move(Imm(0), D(2))        # i = 0
 
-    asm.label('print_str_loop')
+    asm.label("print_str_loop")
     asm.emit_cmp(D(1), D(2))
-    asm.emit_branch(Op.BGE, 'print_str_done')
+    asm.emit_branch(Op.BGE, "print_str_done")
     asm.emit_move(Post(1), D(0))       # D0 = mem[A1]; A1+=4
-    asm.emit_jsr('write_char')
+    asm.emit_jsr("write_char")
     asm.emit_add(Imm(1), D(2))
-    asm.emit_jmp('print_str_loop')
+    asm.emit_jmp("print_str_loop")
 
-    asm.label('print_str_done')
+    asm.label("print_str_done")
     asm.emit_move(Disp(6, -4), D(1))
     asm.emit_move(Disp(6, -8), D(2))
     asm.emit_unlk(6)
@@ -289,7 +301,7 @@ def assemble_sort():
     #   -24(A6)  n-1          (outer limit, не портится inner-loop)
     #   -28(A6)  inner limit  (n-1-i, пересчитывается каждый outer)
     # D1=i, D2=j, D3=tmp, D4=arr[j], D5=arr[j+1], A1=ptr
-    asm.label('bubble_sort')
+    asm.label("bubble_sort")
     asm.emit_link(6, -28)
     asm.emit_move(D(1), Disp(6, -4))
     asm.emit_move(D(2), Disp(6, -8))
@@ -303,9 +315,9 @@ def assemble_sort():
 
     asm.emit_move(Imm(0), D(1))            # i = 0
 
-    asm.label('bs_outer')
+    asm.label("bs_outer")
     asm.emit_cmp(Disp(6, -24), D(1))       # cmp (n-1), i → i - (n-1)
-    asm.emit_branch(Op.BGE, 'bs_done')     # if i >= n-1: done
+    asm.emit_branch(Op.BGE, "bs_done")     # if i >= n-1: done
 
     asm.emit_move(Imm(0), D(2))            # j = 0
     # inner_limit = n-1-i → сохранить в фрейм
@@ -313,9 +325,9 @@ def assemble_sort():
     asm.emit_sub(D(1), D(3))               # D3 = n-1-i
     asm.emit_move(D(3), Disp(6, -28))      # inner_limit в фрейм
 
-    asm.label('bs_inner')
+    asm.label("bs_inner")
     asm.emit_cmp(Disp(6, -28), D(2))       # cmp inner_limit, j → j - limit
-    asm.emit_branch(Op.BGE, 'bs_inner_done')
+    asm.emit_branch(Op.BGE, "bs_inner_done")
 
     # A1 = A0 + j*4
     asm.emit_movea(A(0), 1)
@@ -327,21 +339,21 @@ def assemble_sort():
 
     # if arr[j] <= arr[j+1]: skip swap
     asm.emit_cmp(D(5), D(4))               # D4 - D5
-    asm.emit_branch(Op.BLE, 'bs_no_swap')
+    asm.emit_branch(Op.BLE, "bs_no_swap")
 
     # swap arr[j] ↔ arr[j+1]
     asm.emit_move(D(5), Ind(1))            # arr[j]   = D5
     asm.emit_move(D(4), Disp(1, 4))        # arr[j+1] = D4
 
-    asm.label('bs_no_swap')
+    asm.label("bs_no_swap")
     asm.emit_add(Imm(1), D(2))             # j++
-    asm.emit_jmp('bs_inner')
+    asm.emit_jmp("bs_inner")
 
-    asm.label('bs_inner_done')
+    asm.label("bs_inner_done")
     asm.emit_add(Imm(1), D(1))             # i++
-    asm.emit_jmp('bs_outer')
+    asm.emit_jmp("bs_outer")
 
-    asm.label('bs_done')
+    asm.label("bs_done")
     asm.emit_move(Disp(6, -4),  D(1))
     asm.emit_move(Disp(6, -8),  D(2))
     asm.emit_move(Disp(6, -12), D(3))
@@ -359,25 +371,25 @@ def assemble_sort():
     # A4 = константный указатель на начало массива (не портится функциями)
     # A0 — временный: передаём строки в print_str
     # D0 — аргумент/результат функций
-    asm.label('main')
+    asm.label("main")
     asm.emit_link(6, -16)
 
     # n = read_int()
-    asm.emit_jsr('read_int')
+    asm.emit_jsr("read_int")
     asm.emit_move(D(0), Disp(6, -4))   # n → фрейм
 
     # A4 = &arr[0]  (постоянный указатель на массив, не трогаем)
-    asm.emit_movea(Imm(DATA_OFF['arr']), 4)
+    asm.emit_movea(Imm(DATA_OFF["arr"]), 4)
 
     # ── Чтение n элементов ──────────────────────────────────────────────
     asm.emit_move(Imm(0), Disp(6, -8))  # i = 0
 
-    asm.label('read_loop')
+    asm.label("read_loop")
     asm.emit_move(Disp(6, -8), D(0))   # D0 = i
     asm.emit_cmp(Disp(6, -4), D(0))    # cmp n, i
-    asm.emit_branch(Op.BGE, 'read_done')
+    asm.emit_branch(Op.BGE, "read_done")
 
-    asm.emit_jsr('read_int')            # D0 = прочитанное число
+    asm.emit_jsr("read_int")            # D0 = прочитанное число
 
     # arr[i] = D0:  addr = A4 + i*4
     asm.emit_move(Disp(6, -8), D(1))   # D1 = i
@@ -389,13 +401,13 @@ def assemble_sort():
     asm.emit_move(Disp(6, -8), D(0))
     asm.emit_add(Imm(1), D(0))
     asm.emit_move(D(0), Disp(6, -8))   # i++
-    asm.emit_jmp('read_loop')
+    asm.emit_jmp("read_loop")
 
     # ── Сортировка ──────────────────────────────────────────────────────
-    asm.label('read_done')
+    asm.label("read_done")
     asm.emit_movea(A(4), 0)            # A0 = A4  (bubble_sort ждёт A0)
     asm.emit_move(Disp(6, -4), D(0))  # D0 = n
-    asm.emit_jsr('bubble_sort')
+    asm.emit_jsr("bubble_sort")
     # A0 мог испортиться внутри bubble_sort — восстановим A4 как эталон
     # (A4 не трогается нигде в функциях)
 
@@ -403,10 +415,10 @@ def assemble_sort():
     asm.emit_move(Imm(0), Disp(6, -12))  # sum = 0
     asm.emit_move(Imm(0), Disp(6, -8))   # i = 0
 
-    asm.label('sum_loop')
+    asm.label("sum_loop")
     asm.emit_move(Disp(6, -8), D(0))
     asm.emit_cmp(Disp(6, -4), D(0))
-    asm.emit_branch(Op.BGE, 'sum_done')
+    asm.emit_branch(Op.BGE, "sum_done")
 
     # D0 = arr[i]
     asm.emit_move(Disp(6, -8), D(1))
@@ -420,30 +432,30 @@ def assemble_sort():
     asm.emit_move(Disp(6, -8), D(0))
     asm.emit_add(Imm(1), D(0))
     asm.emit_move(D(0), Disp(6, -8))   # i++
-    asm.emit_jmp('sum_loop')
+    asm.emit_jmp("sum_loop")
 
     # ── Вычисление среднего ─────────────────────────────────────────────
-    asm.label('sum_done')
+    asm.label("sum_done")
     asm.emit_move(Imm(0), Disp(6, -16))  # avg = 0
     asm.emit_cmp(Imm(0), Disp(6, -4))
-    asm.emit_branch(Op.BEQ, 'avg_done')
+    asm.emit_branch(Op.BEQ, "avg_done")
     asm.emit_move(Disp(6, -12), D(0))   # D0 = sum
     asm.emit_move(Disp(6, -4),  D(1))   # D1 = n
     asm.emit_div(D(1), D(0))            # D0 = sum/n
     asm.emit_move(D(0), Disp(6, -16))  # avg = D0
 
     # ── Вывод "Sorted: " ────────────────────────────────────────────────
-    asm.label('avg_done')
-    asm.emit_movea(Imm(DATA_OFF['str_sorted']), 0)
-    asm.emit_jsr('print_str')
+    asm.label("avg_done")
+    asm.emit_movea(Imm(DATA_OFF["str_sorted"]), 0)
+    asm.emit_jsr("print_str")
 
     # ── Вывод элементов массива ─────────────────────────────────────────
     asm.emit_move(Imm(0), Disp(6, -8))  # i = 0
 
-    asm.label('print_loop')
+    asm.label("print_loop")
     asm.emit_move(Disp(6, -8), D(0))
     asm.emit_cmp(Disp(6, -4), D(0))
-    asm.emit_branch(Op.BGE, 'print_done')
+    asm.emit_branch(Op.BGE, "print_done")
 
     # D0 = arr[i]
     asm.emit_move(Disp(6, -8), D(1))
@@ -452,40 +464,40 @@ def assemble_sort():
     asm.emit_add(D(1), A(1))
     asm.emit_move(Ind(1), D(0))
 
-    asm.emit_jsr('write_int')           # вывести arr[i]
+    asm.emit_jsr("write_int")           # вывести arr[i]
 
     # пробел если не последний
     asm.emit_move(Disp(6, -8), D(0))
     asm.emit_add(Imm(1), D(0))         # i+1
     asm.emit_cmp(Disp(6, -4), D(0))    # (i+1) >= n ?
-    asm.emit_branch(Op.BGE, 'no_space')
+    asm.emit_branch(Op.BGE, "no_space")
     asm.emit_move(Imm(32), D(0))
-    asm.emit_jsr('write_char')
+    asm.emit_jsr("write_char")
 
-    asm.label('no_space')
+    asm.label("no_space")
     asm.emit_move(Disp(6, -8), D(0))
     asm.emit_add(Imm(1), D(0))
     asm.emit_move(D(0), Disp(6, -8))   # i++
-    asm.emit_jmp('print_loop')
+    asm.emit_jmp("print_loop")
 
     # ── Вывод "\nSum: <sum>\nAvg: <avg>\n" ─────────────────────────────
-    asm.label('print_done')
+    asm.label("print_done")
     asm.emit_move(Imm(10), D(0))
-    asm.emit_jsr('write_char')
+    asm.emit_jsr("write_char")
 
-    asm.emit_movea(Imm(DATA_OFF['str_sum']), 0)
-    asm.emit_jsr('print_str')
+    asm.emit_movea(Imm(DATA_OFF["str_sum"]), 0)
+    asm.emit_jsr("print_str")
     asm.emit_move(Disp(6, -12), D(0))  # sum
-    asm.emit_jsr('write_int')
+    asm.emit_jsr("write_int")
     asm.emit_move(Imm(10), D(0))
-    asm.emit_jsr('write_char')
+    asm.emit_jsr("write_char")
 
-    asm.emit_movea(Imm(DATA_OFF['str_avg']), 0)
-    asm.emit_jsr('print_str')
+    asm.emit_movea(Imm(DATA_OFF["str_avg"]), 0)
+    asm.emit_jsr("print_str")
     asm.emit_move(Disp(6, -16), D(0))  # avg
-    asm.emit_jsr('write_int')
+    asm.emit_jsr("write_int")
     asm.emit_move(Imm(10), D(0))
-    asm.emit_jsr('write_char')
+    asm.emit_jsr("write_char")
 
     asm.emit_unlk(6)
     asm.emit_halt()
@@ -493,27 +505,27 @@ def assemble_sort():
     return asm.assemble(), asm.labels
 
 
-if __name__ == '__main__':
-    out_dir = os.path.join(os.path.dirname(__file__), '..', 'debug')
+if __name__ == "__main__":
+    out_dir = os.path.join(os.path.dirname(__file__), "..", "debug")
     os.makedirs(out_dir, exist_ok=True)
 
     code, labels = assemble_sort()
 
-    with open(os.path.join(out_dir, 'sort.bin'), 'wb') as f:
+    with open(os.path.join(out_dir, "sort.bin"), "wb") as f:
         f.write(code)
-    with open(os.path.join(out_dir, 'sort.data.bin'), 'wb') as f:
+    with open(os.path.join(out_dir, "sort.data.bin"), "wb") as f:
         f.write(DATA)
-    write_debug(code, os.path.join(out_dir, 'sort.lst'))
-    with open(os.path.join(out_dir, 'sort.labels'), 'w') as f:
+    write_debug(code, os.path.join(out_dir, "sort.lst"))
+    with open(os.path.join(out_dir, "sort.labels"), "w") as f:
         for name, addr in sorted(labels.items(), key=lambda x: x[1]):
             f.write(f"{addr:6d}  {name}\n")
 
     print("=== sort assembled ===")
     print(f"Code size : {len(code)} bytes")
     print(f"Data size : {len(DATA)} bytes")
-    print(f"\nLabels:")
+    print("\nLabels:")
     for name, addr in sorted(labels.items(), key=lambda x: x[1]):
         print(f"  {addr:4d}  {name}")
-    print(f"\nData offsets:")
+    print("\nData offsets:")
     for k, v in DATA_OFF.items():
         print(f"  0x{v:04X}  {k}")
