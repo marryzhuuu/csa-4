@@ -58,19 +58,41 @@ from isa import (
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
-def D(n): return Operand(AM.REG_D, reg=n)
-def A(n): return Operand(AM.REG_A, reg=8+n)
-def Imm(v): return Operand(AM.IMMED, imm=v & 0xFFFFFFFF)
-def Ind(n): return Operand(AM.MEM_IND, reg=8+n)
-def Post(n): return Operand(AM.MEM_POST, reg=8+n)
-def Pre(n): return Operand(AM.MEM_PRE, reg=8+n)
-def Disp(n, d): return Operand(AM.MEM_DISP, reg=8+n, disp=d)
+def D(n):
+    return Operand(AM.REG_D, reg=n)
 
-IO_IN  = 0xFFFF0000   # порт ввода
-IO_OUT = 0xFFFF0004   # порт вывода
+
+def A(n):
+    return Operand(AM.REG_A, reg=8 + n)
+
+
+def Imm(v):
+    return Operand(AM.IMMED, imm=v & 0xFFFFFFFF)
+
+
+def Ind(n):
+    return Operand(AM.MEM_IND, reg=8 + n)
+
+
+def Post(n):
+    return Operand(AM.MEM_POST, reg=8 + n)
+
+
+def Pre(n):
+    return Operand(AM.MEM_PRE, reg=8 + n)
+
+
+def Disp(n, d):
+    return Operand(AM.MEM_DISP, reg=8 + n, disp=d)
+
+
+IO_IN = 0xFFFF0000  # порт ввода
+IO_OUT = 0xFFFF0004  # порт вывода
+
 
 def ei(op, src, dst, sz=False):
     return encode_instr(op, src, dst, size_byte=sz)
+
 
 # ── Константы данных ──────────────────────────────────────────────────────────
 # Каждая Pascal-строка: [int32 length][int32 char0][int32 char1]...
@@ -79,10 +101,12 @@ def pascal_str(s):
     words += [ord(c) for c in s]
     return struct.pack(f">{len(words)}I", *words)
 
-STR_PROMPT   = "What is your name?\n"     # @ 0x0000
-STR_HELLO    = "Hello, "                  # @ 0x0054
-STR_EXCL     = "!\n"                      # @ 0x0070  (offset = (19+1)*4=80=0x50? let's compute)
-STR_STRANGER = "Hello, stranger!\n"       # @ after
+
+STR_PROMPT = "What is your name?\n"  # @ 0x0000
+STR_HELLO = "Hello, "  # @ 0x0054
+STR_EXCL = "!\n"  # @ 0x0070  (offset = (19+1)*4=80=0x50? let's compute)
+STR_STRANGER = "Hello, stranger!\n"  # @ after
+
 
 def build_data_segment():
     data = bytearray()
@@ -97,9 +121,9 @@ def build_data_segment():
         offsets[name] = len(data)
         data.extend(pascal_str(s))
 
-    add("prompt",   STR_PROMPT)    # "What is your name?\n"
-    add("hello",    STR_HELLO)     # "Hello, "
-    add("excl",     STR_EXCL)      # "!\n"
+    add("prompt", STR_PROMPT)  # "What is your name?\n"
+    add("hello", STR_HELLO)  # "Hello, "
+    add("excl", STR_EXCL)  # "!\n"
     add("stranger", STR_STRANGER)  # "Hello, stranger!\n"
 
     # name_buf: 1 слово длины + 64 слова символов = 65*4 = 260 bytes
@@ -108,17 +132,19 @@ def build_data_segment():
 
     return bytes(data), offsets
 
+
 DATA, DATA_OFF = build_data_segment()
 
 # ── Кодогенерация (машинный код) ─────────────────────────────────────────────
 # Мы строим инструкции в список, потом вычисляем адреса меток,
 # потом фиксируем адреса переходов (backpatching).
 
+
 class Assembler:
     def __init__(self):
-        self.code   = bytearray()
-        self.labels = {}       # name -> byte offset in code
-        self.fixups = []       # (offset_in_code, label_name) — адрес перехода
+        self.code = bytearray()
+        self.labels = {}  # name -> byte offset in code
+        self.fixups = []  # (offset_in_code, label_name) — адрес перехода
 
     def here(self):
         return len(self.code)
@@ -191,6 +217,7 @@ class Assembler:
         self.fixup()
         return bytes(self.code)
 
+
 # ── Программа hello_user_name ─────────────────────────────────────────────────
 #
 # На уровне ассемблера реализуем:
@@ -202,6 +229,7 @@ class Assembler:
 #   Чтение символа:  movea.l #IO_IN, A5 ; move.l (A5), D0   → символ в D0 (-1=EOF)
 #   Запись символа:  movea.l #IO_OUT, A5 ; move.l D0, (A5)
 
+
 def assemble_hello():
     asm = Assembler()
 
@@ -210,33 +238,33 @@ def assemble_hello():
     # Использует D1 (counter), D2 (char), A1 (current ptr)
     # Сохраняет A0 через A1 для обхода строки
     asm.label("print_str")
-    asm.emit_link(6, -16)                        # link A6, -16  (save D1,D2,A1)
+    asm.emit_link(6, -16)  # link A6, -16  (save D1,D2,A1)
     # сохранить регистры
     asm.emit_move(D(1), Disp(6, -4))
     asm.emit_move(D(2), Disp(6, -8))
-    asm.emit_movea(A(0), 1)                      # A1 = A0 (ptr to str)
+    asm.emit_movea(A(0), 1)  # A1 = A0 (ptr to str)
     # D1 = length word
-    asm.emit_move(Post(1), D(1))                 # D1 = mem[A1], A1+=4
+    asm.emit_move(Post(1), D(1))  # D1 = mem[A1], A1+=4
     # D2 = 0 (counter i)
     asm.emit_move(Imm(0), D(2))
 
     asm.label("print_str_loop")
-    asm.emit_cmp(D(1), D(2))                     # cmp D1, D2  → D2-D1
-    asm.emit_branch(Op.BGE, "print_str_done")    # if i >= len: done
+    asm.emit_cmp(D(1), D(2))  # cmp D1, D2  → D2-D1
+    asm.emit_branch(Op.BGE, "print_str_done")  # if i >= len: done
 
     # read char from string
-    asm.emit_move(Post(1), D(0))                 # D0 = mem[A1]; A1+=4
+    asm.emit_move(Post(1), D(0))  # D0 = mem[A1]; A1+=4
 
     # write to IO port
-    asm.emit_movea(Imm(IO_OUT), 5)               # A5 = IO_OUT
-    asm.emit_move(D(0), Ind(5))                  # mem[A5] = D0
+    asm.emit_movea(Imm(IO_OUT), 5)  # A5 = IO_OUT
+    asm.emit_move(D(0), Ind(5))  # mem[A5] = D0
 
-    asm.emit_add(Imm(1), D(2))                   # i++
+    asm.emit_add(Imm(1), D(2))  # i++
     asm.emit_jmp("print_str_loop")
 
     asm.label("print_str_done")
-    asm.emit_move(Disp(6, -4), D(1))             # restore D1
-    asm.emit_move(Disp(6, -8), D(2))             # restore D2
+    asm.emit_move(Disp(6, -4), D(1))  # restore D1
+    asm.emit_move(Disp(6, -8), D(2))  # restore D2
     asm.emit_unlk(6)
     asm.emit_rts()
 
@@ -248,17 +276,17 @@ def assemble_hello():
     asm.emit_link(6, -16)
     asm.emit_move(D(1), Disp(6, -4))
     asm.emit_move(D(2), Disp(6, -8))
-    asm.emit_movea(A(0), 1)                      # A1 = A0
-    asm.emit_add(Imm(4), A(1))                   # A1 += 4 (skip length word, point to chars)
-    asm.emit_move(Imm(0), D(1))                  # i = 0
+    asm.emit_movea(A(0), 1)  # A1 = A0
+    asm.emit_add(Imm(4), A(1))  # A1 += 4 (skip length word, point to chars)
+    asm.emit_move(Imm(0), D(1))  # i = 0
 
     asm.label("read_line_loop")
-    asm.emit_cmp(Imm(64), D(1))                  # i < 64?
+    asm.emit_cmp(Imm(64), D(1))  # i < 64?
     asm.emit_branch(Op.BGE, "read_line_store")
 
     # read char from IO
     asm.emit_movea(Imm(IO_IN), 5)
-    asm.emit_move(Ind(5), D(2))                  # D2 = IO_IN
+    asm.emit_move(Ind(5), D(2))  # D2 = IO_IN
 
     # check EOF (-1 = 0xFFFFFFFF)
     asm.emit_cmp(Imm(0xFFFFFFFF), D(2))
@@ -269,14 +297,14 @@ def assemble_hello():
     asm.emit_branch(Op.BEQ, "read_line_store")
 
     # store char
-    asm.emit_move(D(2), Post(1))                 # mem[A1]=D2; A1+=4
-    asm.emit_add(Imm(1), D(1))                   # i++
+    asm.emit_move(D(2), Post(1))  # mem[A1]=D2; A1+=4
+    asm.emit_add(Imm(1), D(1))  # i++
     asm.emit_jmp("read_line_loop")
 
     asm.label("read_line_store")
     # write length word to buf[0]
-    asm.emit_move(D(1), Ind(0))                  # mem[A0] = i
-    asm.emit_move(D(1), D(0))                    # return value = i
+    asm.emit_move(D(1), Ind(0))  # mem[A0] = i
+    asm.emit_move(D(1), D(0))  # return value = i
 
     asm.emit_move(Disp(6, -4), D(1))
     asm.emit_move(Disp(6, -8), D(2))
@@ -322,8 +350,10 @@ def assemble_hello():
 
     return asm.assemble(), asm.labels
 
+
 if __name__ == "__main__":
     import os
+
     out_dir = os.path.join(os.path.dirname(__file__), "..", "debug")
     os.makedirs(out_dir, exist_ok=True)
 
