@@ -940,6 +940,107 @@ class CodeGen:
         else:
             raise CompileError(f"Неизвестный оператор: {type(stmt).__name__}")
 
+    def compile_cond(self, expr, lbl_false: str):
+        """
+        Скомпилировать булево условие и прыгнуть на lbl_false если оно ложно.
+        Для сравнений (<, <=, >, >=, ==, !=) генерирует CMP + Bxx напрямую,
+        без промежуточного вычисления bool в D0.
+        Для остальных выражений использует общий путь: compile_expr + cmp #0.
+        """
+        # Прямая компиляция сравнений — одна/две инструкции
+        if isinstance(expr, BinOp) and expr.op in ('<', '<=', '>', '>=', '==', '!='):
+            inv = {'<': Op.BGE, '<=': Op.BGT, '>': Op.BLE,
+                   '>=': Op.BLT, '==': Op.BNE, '!=': Op.BEQ}
+            # Оптимизация: правый операнд — literal → CMP #imm, D0
+            def _as_imm(node):
+                if isinstance(node, Literal) and isinstance(node.value, int):  return Imm(node.value)
+                if isinstance(node, Literal) and isinstance(node.value, bool): return Imm(1 if node.value else 0)
+                if isinstance(node, UnOp) and node.op == '-' and isinstance(node.operand, Literal) and isinstance(node.operand.value, int):
+                    return Imm(-node.operand.value)
+                return None
+            right_imm = _as_imm(expr.right)
+            if right_imm is not None:
+                self.compile_expr(expr.left)          # left → D0
+                self._emit(_ei(Op.CMP, right_imm, D(0)))  # CMP #imm, D0
+                self._branch(inv[expr.op], lbl_false)
+                return
+            # Общий случай: оба не-immediate
+            # Оптимизация: левый — Ident, правый — тоже Ident или literal.
+            # Только в этом случае можно загрузить левый в D1 напрямую —
+            # правый не будет использовать стек/D1 при вычислении.
+            def _is_simple(node):
+                return (isinstance(node, Ident) or
+                        isinstance(node, Literal) or
+                        (isinstance(node, UnOp) and node.op == '-' and isinstance(node.operand, Literal)))
+            if isinstance(expr.left, Ident) and _is_simple(expr.right):
+                info = self._var(expr.left.name)
+                off, typ, _ = info
+                if typ != 'str':
+                    right_imm2 = _as_imm(expr.right)
+                    if right_imm2 is not None:
+                        # left=Ident, right=literal → 2 инструкции
+                        self._emit(_ei(Op.MOVE, Disp(FP, off), D(0)))
+                        self._emit(_ei(Op.CMP, right_imm2, D(0)))
+                    else:
+                        # left=Ident, right=Ident → D1=left, D0=right, без стека
+                        self._emit(_ei(Op.MOVE, Disp(FP, off), D(1)))  # D1 = left
+                        self.compile_expr(expr.right)                   # D0 = right (простой load)
+                        self._emit(_ei(Op.CMP, D(0), D(1)))
+                    self._branch(inv[expr.op], lbl_false)
+                    return
+            self.compile_expr(expr.left)
+            self._emit(_ei(Op.MOVE, D(0), Pre(SP)))
+            self.compile_expr(expr.right)
+            self._emit(_ei(Op.MOVE, Post(SP), D(1)))
+            self._emit(_ei(Op.CMP, D(0), D(1)))      # flags для D1-D0
+            self._branch(inv[expr.op], lbl_false)
+            return
+        # Прямая компиляция && и || тоже с коротким замыканием прямо на lbl_false
+        if isinstance(expr, BinOp) and expr.op == '&&':
+            self.compile_cond(expr.left,  lbl_false)
+            self.compile_cond(expr.right, lbl_false)
+            return
+        if isinstance(expr, BinOp) and expr.op == '||':
+            lbl_ok = self._lbl('or_ok')
+            # если левое ИСТИННО — пропустить проверку правого
+            self.compile_expr(expr.left)
+            self._emit(_ei(Op.CMP, Imm(0), D(0)))
+            self._branch(Op.BNE, lbl_ok)
+            self.compile_cond(expr.right, lbl_false)
+            self._label(lbl_ok)
+            return
+        if isinstance(expr, UnOp) and expr.op == '!':
+            # !cond — инвертируем: если sub-выражение ИСТИННО → прыгнуть на false
+            lbl_sub_true = self._lbl('not_t')
+            lbl_after    = self._lbl('not_a')
+            self.compile_cond_true(expr.operand, lbl_sub_true)
+            # sub-выражение ложно → условие истинно, не прыгаем
+            self._jmp(lbl_after)
+            self._label(lbl_sub_true)
+            self._jmp(lbl_false)
+            self._label(lbl_after)
+            return
+        # Общий случай: вычислить в D0, проверить
+        self.compile_expr(expr)
+        self._emit(_ei(Op.CMP, Imm(0), D(0)))
+        self._branch(Op.BEQ, lbl_false)
+
+    def compile_cond_true(self, expr, lbl_true: str):
+        """Прыгнуть на lbl_true если условие ИСТИННО (для реализации !)."""
+        if isinstance(expr, BinOp) and expr.op in ('<', '<=', '>', '>=', '==', '!='):
+            self.compile_expr(expr.left)
+            self._emit(_ei(Op.MOVE, D(0), Pre(SP)))
+            self.compile_expr(expr.right)
+            self._emit(_ei(Op.MOVE, Post(SP), D(1)))
+            self._emit(_ei(Op.CMP, D(0), D(1)))
+            fwd = {'<': Op.BLT, '<=': Op.BLE, '>': Op.BGT,
+                   '>=': Op.BGE, '==': Op.BEQ, '!=': Op.BNE}
+            self._branch(fwd[expr.op], lbl_true)
+            return
+        self.compile_expr(expr)
+        self._emit(_ei(Op.CMP, Imm(0), D(0)))
+        self._branch(Op.BNE, lbl_true)
+
     def compile_var_decl(self, decl: VarDecl):
         off = self._alloc_local(decl.name, decl.typ.name, decl.is_const)
         if decl.init is not None:
@@ -974,9 +1075,7 @@ class CodeGen:
         lbl_else = self._lbl('else')
         lbl_end  = self._lbl('fi')
 
-        self.compile_expr(stmt.cond)               # результат в D0
-        self._emit(_ei(Op.CMP, Imm(0), D(0)))
-        self._branch(Op.BEQ, lbl_else)             # if false → else
+        self.compile_cond(stmt.cond, lbl_else)     # если ложно → else
 
         self.compile_block(stmt.then_, ret_type)
         if stmt.else_ is not None:
@@ -997,9 +1096,7 @@ class CodeGen:
         self.loop_cont_stack.append(lbl_top)
 
         self._label(lbl_top)
-        self.compile_expr(stmt.cond)
-        self._emit(_ei(Op.CMP, Imm(0), D(0)))
-        self._branch(Op.BEQ, lbl_end)
+        self.compile_cond(stmt.cond, lbl_end)      # если ложно → выход
 
         self.compile_block(stmt.body, ret_type)
         self._jmp(lbl_top)
@@ -1022,9 +1119,7 @@ class CodeGen:
 
         self._label(lbl_top)
         if stmt.cond:
-            self.compile_expr(stmt.cond)
-            self._emit(_ei(Op.CMP, Imm(0), D(0)))
-            self._branch(Op.BEQ, lbl_end)
+            self.compile_cond(stmt.cond, lbl_end)  # если ложно → выход
 
         self.compile_block(stmt.body, ret_type)
 
@@ -1106,6 +1201,10 @@ class CodeGen:
         return typ
 
     def _compile_unop(self, expr: UnOp):
+        if expr.op == '-' and isinstance(expr.operand, Literal) and isinstance(expr.operand.value, int):
+            # Оптимизация: -N → одна инструкция move.l #-N, D0
+            self._emit(_ei(Op.MOVE, Imm(-expr.operand.value), D(0)))
+            return 'int'
         t = self.compile_expr(expr.operand)
         if expr.op == '-':
             # D0 = 0 - D0
@@ -1162,58 +1261,96 @@ class CodeGen:
             self._label(lbl_end)
             return 'bool'
 
-        # Вычислить левую часть → D0, сохранить, вычислить правую → D0
-        # Потом применить операцию.
-        # Для экономии регистров: left → D1, right → D0
-        t_left = self.compile_expr(expr.left)
-
-        # Для str сравнение не поддерживается
-        if t_left == 'str':
-            raise CompileError(f"Операция {op!r} не поддерживается для строк")
-
-        # Сохранить левый результат в D2 (не трогается правой стороной в простых случаях)
-        # Используем стек для безопасности при вложенных выражениях
-        self._emit(_ei(Op.MOVE, D(0), Pre(SP)))    # push D0
-
-        t_right = self.compile_expr(expr.right)    # right → D0
-
-        self._emit(_ei(Op.MOVE, Post(SP), D(1)))   # pop → D1  (left)
-        # теперь: D1 = left, D0 = right
-
-        arith = {'+': Op.ADD, '-': Op.SUB, '*': Op.MUL, '/': Op.DIV, '%': None}
+        arith   = {'+': Op.ADD, '-': Op.SUB, '*': Op.MUL, '/': Op.DIV}
         cmp_ops = {'==', '!=', '<', '<=', '>', '>='}
 
-        if op in arith and op != '%':
+        # ── Оптимизация: правый операнд — числовой литерал ──────────────
+        # Тогда левый результат уже в D0 и можно применить операцию напрямую,
+        # без push/pop для сохранения левого.
+        def _right_imm(node):
+            """Вернуть Imm(value) если node — числовой/булев литерал или -literal."""
+            if isinstance(node, Literal) and isinstance(node.value, int):
+                return Imm(node.value)
+            if isinstance(node, Literal) and isinstance(node.value, bool):
+                return Imm(1 if node.value else 0)
+            if isinstance(node, UnOp) and node.op == '-' and isinstance(node.operand, Literal) and isinstance(node.operand.value, int):
+                return Imm(-node.operand.value)
+            return None
+
+        right_imm = _right_imm(expr.right)
+        if right_imm is not None:
+            t_left = self.compile_expr(expr.left)
+            if t_left == 'str':
+                raise CompileError(f"Операция {op!r} не поддерживается для строк")
+            # D0 = left; применяем op с immediate-правым
+            if op in arith:
+                if op == '/':
+                    self._emit(_ei(Op.MOVE, right_imm, D(1)))
+                    self._emit(_ei(Op.DIV, D(1), D(0)))
+                elif op == '-':
+                    # D0 - imm: используем SUB imm, D0 → но SUB src,dst = dst-src,
+                    # т.е. emit SUB #imm, D0 → D0 = D0 - imm
+                    self._emit(_ei(Op.SUB, right_imm, D(0)))
+                else:
+                    self._emit(_ei(arith[op], right_imm, D(0)))
+                return 'int'
+            if op == '%':
+                imm_val = right_imm.imm if right_imm.imm < 0x80000000 else right_imm.imm - 0x100000000
+                self._emit(_ei(Op.MOVE, D(0), D(1)))         # D1 = a
+                self._emit(_ei(Op.MOVE, right_imm, D(2)))    # D2 = b
+                self._emit(_ei(Op.DIV,  D(2), D(1)))         # D1 = a/b
+                self._emit(_ei(Op.MUL,  D(2), D(1)))         # D1 = (a/b)*b
+                self._emit(_ei(Op.SUB,  D(1), D(0)))         # D0 = a - (a/b)*b
+                return 'int'
+            if op in cmp_ops:
+                # CMP right_imm, D0  → flags для D0 - right_imm
+                self._emit(_ei(Op.CMP, right_imm, D(0)))
+                lbl_t = self._lbl('cmp_t')
+                lbl_e = self._lbl('cmp_e')
+                branch_map = {'==': Op.BEQ, '!=': Op.BNE, '<': Op.BLT,
+                              '<=': Op.BLE, '>': Op.BGT, '>=': Op.BGE}
+                self._branch(branch_map[op], lbl_t)
+                self._emit(_ei(Op.MOVE, Imm(0), D(0)))
+                self._jmp(lbl_e)
+                self._label(lbl_t)
+                self._emit(_ei(Op.MOVE, Imm(1), D(0)))
+                self._label(lbl_e)
+                return 'bool'
+
+        # ── Общий случай: оба операнда не-immediate ──────────────────────
+        # left → D0, push, right → D0, pop left → D1
+        t_left = self.compile_expr(expr.left)
+        if t_left == 'str':
+            raise CompileError(f"Операция {op!r} не поддерживается для строк")
+        self._emit(_ei(Op.MOVE, D(0), Pre(SP)))    # push left
+        self.compile_expr(expr.right)              # right → D0
+        self._emit(_ei(Op.MOVE, Post(SP), D(1)))   # pop → D1 (left)
+        # D1 = left, D0 = right
+
+        if op in arith:
             if op == '/':
-                # D1 / D0  → D1
                 self._emit(_ei(Op.DIV, D(0), D(1)))
                 self._emit(_ei(Op.MOVE, D(1), D(0)))
             else:
-                # D1 op D0 → D1  (for sub: D1 - D0)
                 self._emit(_ei(arith[op], D(0), D(1)))
                 self._emit(_ei(Op.MOVE, D(1), D(0)))
             return 'int'
 
         if op == '%':
-            # a % b = a - (a/b)*b
-            self._emit(_ei(Op.MOVE, D(1), D(2)))   # D2 = a
-            self._emit(_ei(Op.MOVE, D(0), D(3)))   # D3 = b
-            self._emit(_ei(Op.DIV,  D(3), D(2)))   # D2 = a/b
-            self._emit(_ei(Op.MUL,  D(3), D(2)))   # D2 = (a/b)*b
-            self._emit(_ei(Op.MOVE, D(1), D(0)))   # D0 = a
-            self._emit(_ei(Op.SUB,  D(2), D(0)))   # D0 = a - (a/b)*b
+            self._emit(_ei(Op.MOVE, D(1), D(2)))
+            self._emit(_ei(Op.MOVE, D(0), D(3)))
+            self._emit(_ei(Op.DIV,  D(3), D(2)))
+            self._emit(_ei(Op.MUL,  D(3), D(2)))
+            self._emit(_ei(Op.MOVE, D(1), D(0)))
+            self._emit(_ei(Op.SUB,  D(2), D(0)))
             return 'int'
 
         if op in cmp_ops:
-            # CMP: dst - src; нам нужно D1 - D0
             self._emit(_ei(Op.CMP, D(0), D(1)))    # flags for D1 - D0
             lbl_t = self._lbl('cmp_t')
             lbl_e = self._lbl('cmp_e')
-            branch_map = {
-                '==': Op.BEQ, '!=': Op.BNE,
-                '<':  Op.BLT, '<=': Op.BLE,
-                '>':  Op.BGT, '>=': Op.BGE,
-            }
+            branch_map = {'==': Op.BEQ, '!=': Op.BNE, '<': Op.BLT,
+                          '<=': Op.BLE, '>': Op.BGT, '>=': Op.BGE}
             self._branch(branch_map[op], lbl_t)
             self._emit(_ei(Op.MOVE, Imm(0), D(0)))
             self._jmp(lbl_e)
@@ -1223,6 +1360,17 @@ class CodeGen:
             return 'bool'
 
         raise CompileError(f"Неизвестный бинарный оператор: {op!r}")
+
+    def _load_ident_to(self, name: str, reg_d: int) -> bool:
+        """Загрузить int-переменную name прямо в D(reg_d). Вернуть True если успешно."""
+        info = self.scope.lookup(name) if self.scope else None
+        if info is None:
+            return False
+        off, typ, _ = info
+        if typ == 'str':
+            return False
+        self._emit(_ei(Op.MOVE, Disp(FP, off), D(reg_d)))
+        return True
 
     def _compile_call(self, call: Call):
         name = call.name
@@ -1287,25 +1435,34 @@ class CodeGen:
                 f"передано {len(call.args)} (строка {call.line})")
 
         # Вычислить аргументы и разложить по регистрам.
-        # Стратегия: вычислить все на стек, потом загрузить в регистры.
-        # Это безопасно для вложенных вызовов.
-        for arg in call.args:
-            t = self.compile_expr(arg)
-            if t == 'str':
-                self._emit(_ei(Op.MOVE, A(0), Pre(SP)))
-            else:
-                self._emit(_ei(Op.MOVE, D(0), Pre(SP)))
+        # Оптимизация: если аргумент один — вычислить прямо в нужный регистр.
+        # При нескольких аргументах: вычислить все на стек, затем снять в регистры.
+        # Это корректно при вложенных вызовах (каждый compile_expr может
+        # перезаписать D0/A0, поэтому предыдущие надо сохранить).
+        if len(call.args) == 1:
+            # Один аргумент: вычислить сразу в нужный регистр — без push/pop
+            _, ptyp = fn.params[0]
+            self.compile_expr(call.args[0])
+            # Результат уже в D0 (int/bool) или A0 (str) — регистр совпадает
+            # с соглашением о вызовах, дополнительных move не нужно
+        else:
+            # Несколько аргументов: сохранить через стек
+            for arg in call.args:
+                t = self.compile_expr(arg)
+                if t == 'str':
+                    self._emit(_ei(Op.MOVE, A(0), Pre(SP)))
+                else:
+                    self._emit(_ei(Op.MOVE, D(0), Pre(SP)))
 
-        # Загрузить со стека в регистры (в обратном порядке)
-        d_idx = sum(1 for _, ptyp in fn.params if ptyp != 'str') - 1
-        a_idx = sum(1 for _, ptyp in fn.params if ptyp == 'str') - 1
-        for _, ptyp in reversed(fn.params):
-            if ptyp == 'str':
-                self._emit(_ei(Op.MOVEA, Post(SP), A(a_idx)))
-                a_idx -= 1
-            else:
-                self._emit(_ei(Op.MOVE, Post(SP), D(d_idx)))
-                d_idx -= 1
+            d_idx = sum(1 for _, ptyp in fn.params if ptyp != 'str') - 1
+            a_idx = sum(1 for _, ptyp in fn.params if ptyp == 'str') - 1
+            for _, ptyp in reversed(fn.params):
+                if ptyp == 'str':
+                    self._emit(_ei(Op.MOVEA, Post(SP), A(a_idx)))
+                    a_idx -= 1
+                else:
+                    self._emit(_ei(Op.MOVE, Post(SP), D(d_idx)))
+                    d_idx -= 1
 
         self._jsr(name)
         return fn.ret_type
@@ -1464,13 +1621,58 @@ def compile_file(src_path: str, out_dir: str):
         print("\n[!] Функция main не найдена", file=sys.stderr)
 
 
+HELP = """
+compiler.py — компилятор языка JavaLight (JL) в бинарный формат M68k Harvard ISA
+
+Использование:
+  python compiler.py <source.jl> [output_dir]
+  python compiler.py -h | --help
+
+Обязательные аргументы:
+  <source.jl>          Путь к исходному файлу на языке JL
+
+Необязательные аргументы:
+  [output_dir]         Директория для выходных файлов
+                       По умолчанию: {default_out!r}
+  -h, --help           Показать эту справку и выйти
+
+Выходные файлы (имя берётся из <source.jl> без расширения):
+  <stem>.imem          Бинарный образ памяти команд (instruction memory)
+  <stem>.dmem          Бинарный образ памяти данных (data memory)
+  <stem>.labels        Таблица меток: адрес → имя функции/метки
+  <stem>.lst           Листинг дизассемблированного кода
+  <stem>.ast           Абстрактное синтаксическое дерево (human-readable)
+
+Константы (из config.py):
+  IO_IN  = {io_in:#010x}    Адрес порта ввода  в dmem (memory-mapped)
+  IO_OUT = {io_out:#010x}   Адрес порта вывода в dmem (memory-mapped)
+  DEFAULT_OUT_DIR = {default_out!r}
+
+Примеры:
+  python compiler.py hello.jl
+  python compiler.py hello.jl ./build
+  python compiler.py programs/sort.jl out/
+"""
+
+
 def main():
-    if len(sys.argv) < 2 or len(sys.argv) > 3:
-        print(f"Использование: {sys.argv[0]} <source.jl> [<output_dir>]")
-        print(f"  output_dir по умолчанию: {DEFAULT_OUT_DIR!r}")
+    args = sys.argv[1:]
+
+    if not args or args[0] in ('-h', '--help'):
+        print(HELP.format(
+            default_out=DEFAULT_OUT_DIR,
+            io_in=IO_IN,
+            io_out=IO_OUT,
+        ))
+        sys.exit(0 if args and args[0] in ('-h', '--help') else 1)
+
+    if len(args) > 2:
+        print(f"Ошибка: слишком много аргументов.", file=sys.stderr)
+        print(f"Запустите с -h для справки.", file=sys.stderr)
         sys.exit(1)
-    src_path = sys.argv[1]
-    out_dir  = sys.argv[2] if len(sys.argv) == 3 else DEFAULT_OUT_DIR
+
+    src_path = args[0]
+    out_dir  = args[1] if len(args) == 2 else DEFAULT_OUT_DIR
     compile_file(src_path, out_dir)
 
 
