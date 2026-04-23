@@ -1,51 +1,40 @@
-// hello_user_name.jll
-// Запрашивает имя пользователя и приветствует его.
-// Использует Pascal-строки (Length-prefixed).
-
-// Стандартные IO-функции (реализованы как встроенные,
-// отображённые на memory-mapped порты ввода-вывода).
-//   read_char()  : int  -- читает один символ из порта ввода
-//   write_char(c : int) -- пишет один символ в порт вывода
-//   write_str(s  : str) -- пишет Pascal-строку посимвольно
+// hello_user_name.jl
+// Запрашивает имя пользователя, выводит приветствие.
 
 fn print_str(s: str) : void {
     var i: int = 0;
-    var len: int = str_len(s);   // встроенная: читает слово-длину
+    var len: int = str_len(s);
     while (i < len) {
-        write_char(str_get(s, i)); // встроенная: читает i-й символ
+        write_char(str_get(s, i));
         i = i + 1;
     }
 }
 
-fn read_line(buf: str, max: int) : int {
-    // Читает символы до '\n' или конца ввода.
-    // Возвращает количество прочитанных символов.
+fn read_line(buf: str, maxlen: int) : int {
     var i: int = 0;
     var c: int = 0;
-    while (i < max) {
+    while (i < maxlen) {
         c = read_char();
-        if (c == -1) {    // конец ввода
+        if (c == -1) {
             break;
         }
-        if (c == 10) {    // '\n'
+        if (c == 10) {
             break;
         }
-        str_set(buf, i, c);  // встроенная: запись i-го символа
+        str_set(buf, i, c);
         i = i + 1;
     }
-    str_set_len(buf, i);     // встроенная: устанавливает слово-длину
+    str_set_len(buf, i);
     return i;
 }
 
 fn main() : void {
-    var name_buf: str;     // Буфер — Pascal-строка в секции данных
-    var greeting: str;
+    var name_buf: str;
+    var n: int = 0;
 
-    // Вывести приглашение
     print_str("What is your name?\n");
 
-    // Читаем имя
-    var n: int = read_line(name_buf, 64);
+    n = read_line(name_buf, 64);
 
     if (n == 0) {
         print_str("Hello, stranger!\n");
