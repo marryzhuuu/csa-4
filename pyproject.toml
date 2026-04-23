@@ -7,6 +7,10 @@ license = "GPL-3.0"
 readme = "README.md"
 packages = [{include = "*.py", from="src"}]
 
+[tool.poetry.scripts]
+compile = "src.compiler:main"
+run = "src.emulator:main"
+
 [tool.poetry.dependencies]
 python = "^3.12"
 
