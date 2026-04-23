@@ -9,10 +9,12 @@ import argparse
 import os
 import struct
 import sys
+import logging
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "asm"))
-from config import DEFAULT_OUT_DIR, IO_IN, IO_OUT
+from config import DEFAULT_OUT_DIR, IO_IN, IO_OUT, DEFAULT_TRACE_LIMIT
 from isa import AM, Op
+
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  CPU
@@ -608,9 +610,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--trace-limit",
         metavar="N",
         type=int,
-        default=200,
+        default=DEFAULT_TRACE_LIMIT,
         help=(
-            "Максимальное число строк трассировки, выводимых на экран " "(по умолчанию: 200). Не влияет на --trace-out."
+            f"Максимальное число строк трассировки, выводимых на экран (по умолчанию: {DEFAULT_TRACE_LIMIT}). Не влияет на --trace-out."
         ),
     )
     parser.add_argument(
@@ -640,6 +642,45 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def run(target_code: str, target_data: str, target_labels: str, input_stream: str) -> None:
+    try:
+        code = open(target_code, "rb").read()
+        data = open(target_data, "rb").read()
+        labels = load_labels(target_labels)
+        tokens = tokens_from_file(input_stream)
+        start_pc = labels["main"]
+
+    except OSError as e:
+        print(f"Ошибка чтения файла: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    cpu = CPU(
+        code,
+        data,
+        tokens,
+        True
+    )
+    cpu.run(start_pc=start_pc)
+    print("=== Вывод программы ===")
+    print(cpu.output_str(), end="")
+
+    # ── Трассировка в логгер ──────────────────────────────────────────────
+    # logging.debug("\n")
+    total = len(cpu.trace_log)
+    limit = DEFAULT_TRACE_LIMIT
+    shown = min(limit, total)
+    logging.debug(f"=== Трассировка (первые {shown} из {total} команд) ===")
+    logging.debug(f"  {'addr':>5} | {'cycle':>7} | {'мнемоника':<36}| регистры")
+    logging.debug("  " + "-" * 108)
+    for line in cpu.trace_log[:limit]:
+        logging.debug(f" {line}")
+    if total > limit:
+        logging.debug(f"  ... ещё {total - limit} команд (используйте --trace-out для полного журнала)")
+
+
+
+
+    
 def main():
     parser = build_parser()
     args = parser.parse_args()
@@ -733,13 +774,13 @@ def main():
         total = len(cpu.trace_log)
         limit = args.trace_limit
         shown = min(limit, total)
-        print(f"=== Трассировка (первые {shown} из {total} тактов) ===")
+        print(f"=== Трассировка (первые {shown} из {total} команд) ===")
         print(f"  {'addr':>5} | {'cycle':>7} | {'мнемоника':<36}| регистры")
         print("  " + "-" * 108)
         for line in cpu.trace_log[:limit]:
             print(" ", line)
         if total > limit:
-            print(f"  ... ещё {total - limit} тактов (используйте --trace-out для полного журнала)")
+            print(f"  ... ещё {total - limit} команд (используйте --trace-out для полного журнала)")
 
     # ── Трассировка в файл ────────────────────────────────────────────────
     if args.trace_out:

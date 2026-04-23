@@ -2141,7 +2141,7 @@ compiler.py — компилятор языка JavaLight (JL) в бинарны
   python compiler.py -h | --help
 
 Обязательные аргументы:
-  <source.jl>          Путь к исходному файлу на языке JL
+  <source.jl>          Исходный файл на языке JL
 
 Необязательные аргументы:
   [output_dir]         Директория для выходных файлов
@@ -2165,6 +2165,9 @@ compiler.py — компилятор языка JavaLight (JL) в бинарны
   python compiler.py hello.jl ./build
   python compiler.py programs/sort.jl out/
 """
+
+def run(source_file: str, out_dir: str) -> None:
+    compile_file(source_file, out_dir)
 
 
 def main():

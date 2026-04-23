@@ -1,9 +1,0 @@
-     0  print_str
-    40  print_str_loop
-    84  print_str_done
-   108  read_line
-   152  read_line_loop
-   232  read_line_store
-   264  main
-   376  say_stranger
-   392  main_done
