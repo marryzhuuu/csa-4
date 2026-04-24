@@ -1741,22 +1741,43 @@ class CodeGen:
     def listing(self) -> str:
         from io import StringIO
 
+        # Ширины колонок — фиксированные:
+        #   addr : 6 символов (десятичный адрес)
+        #   hex  : 32 символа (макс. 4 слова × 8 hex-символов)
+        #   mnem : 28 символов (самые длинные мнемоники ~24 символа + запас)
+        # Метки выводятся справа от мнемоники в единой выровненной колонке.
+        ADDR_W = 6
+        HEX_W  = 32
+        MNEM_W = 28
+
         out = StringIO()
-        offset = 0
         code = bytes(self.code)
-        # обратная карта меток
-        lbl_by_addr = {}
+
+        # Обратная карта: адрес → список меток.
+        # Сортировка: пользовательские метки перед внутренними (__*).
+        lbl_by_addr: dict[int, list[str]] = {}
         for name, addr in self.labels.items():
             lbl_by_addr.setdefault(addr, []).append(name)
+        for addr in lbl_by_addr:
+            lbl_by_addr[addr].sort(key=lambda n: (n.startswith("_"), n))
 
+        offset = 0
         while offset < len(code):
-            if offset in lbl_by_addr:
-                for n in lbl_by_addr[offset]:
-                    out.write(f"; {n}:\n")
+            lbls = lbl_by_addr.get(offset, [])
             mnem, size = _decode(code, offset)
             hx = code[offset : offset + size].hex().upper()
-            out.write(f"{offset} - {hx} - {mnem}\n")
+
+            # Метки справа от мнемоники через "; ", или пусто
+            lbl_str = ("; " + ", ".join(lbls)) if lbls else ""
+
+            out.write(
+                f"{offset:{ADDR_W}d}"
+                f"  {hx:<{HEX_W}}"
+                f"  {mnem:<{MNEM_W}}"
+                f"{lbl_str}\n"
+            )
             offset += size
+
         return out.getvalue()
 
 

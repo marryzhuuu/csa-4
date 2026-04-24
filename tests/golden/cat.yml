@@ -311,132 +311,116 @@ out_code_hex: |
   ;      596  wh_end_4
   ;      644  main
   ;
-  ; __entry:
-  0 - 402F000000000284 - jmp @644
-  ; __rt_write_char:
-  8 - 02210D00FFFF0004 - movea.l #4294901764, A5
-  16 - 01030D00 - move.l D0, (A5)
-  20 - 42FF0000 - rts
-  ; __rt_read_char:
-  24 - 02210D00FFFF0000 - movea.l #4294901760, A5
-  32 - 0130D000 - move.l (A5), D0
-  36 - 42FF0000 - rts
-  ; __rt_str_len:
-  40 - 01308000 - move.l (A0), D0
-  44 - 42FF0000 - rts
-  ; __rt_str_get:
-  48 - 60210E00FFFFFFF8 - link.l #4294967288, A6
-  56 - 01061E00FFFFFFFC - move.l D1, -4(A6)
-  64 - 02118900 - movea.l A0, A1
-  68 - 1021090000000004 - add.l #4, A1
-  76 - 01000100 - move.l D0, D1
-  80 - 1220010000000004 - mul.l #4, D1
-  88 - 10011900 - add.l D1, A1
-  92 - 01309000 - move.l (A1), D0
-  96 - 0160E100FFFFFFFC - move.l -4(A6), D1
-  104 - 611FE000 - unlk A6
-  108 - 42FF0000 - rts
-  ; __rt_str_set:
-  112 - 60210E00FFFFFFF8 - link.l #4294967288, A6
-  120 - 01062E00FFFFFFFC - move.l D2, -4(A6)
-  128 - 02118900 - movea.l A0, A1
-  132 - 1021090000000004 - add.l #4, A1
-  140 - 01000200 - move.l D0, D2
-  144 - 1220020000000004 - mul.l #4, D2
-  152 - 10012900 - add.l D2, A1
-  156 - 01031900 - move.l D1, (A1)
-  160 - 0160E200FFFFFFFC - move.l -4(A6), D2
-  168 - 611FE000 - unlk A6
-  172 - 42FF0000 - rts
-  ; __rt_str_set_len:
-  176 - 01030800 - move.l D0, (A0)
-  180 - 42FF0000 - rts
-  ; print_str:
-  184 - 60210E00FFFFFFF4 - link.l #4294967284, A6
-  192 - 01168E00FFFFFFFC - move.l A0, -4(A6)
-  200 - 0120000000000000 - move.l #0, D0
-  208 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
-  216 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  224 - 412F000000000028 - jsr @40
-  232 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
-  ; wh_top_1:
-  240 - 0160E100FFFFFFF8 - move.l -8(A6), D1
-  248 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  256 - 14000100 - cmp.l D0, D1
-  260 - 552F000000000154 - bge @340
-  268 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  276 - 01158F00 - move.l A0, -(A7)
-  280 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  288 - 0241F800 - movea.l (A7)+, A0
-  292 - 412F000000000030 - jsr @48
-  300 - 412F000000000008 - jsr @8
-  308 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  316 - 1020000000000001 - add.l #1, D0
-  324 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
-  332 - 402F0000000000F0 - jmp @240
-  ; wh_end_2:
-  340 - 611FE000 - unlk A6
-  344 - 42FF0000 - rts
-  ; read_line:
-  348 - 60210E00FFFFFFF0 - link.l #4294967280, A6
-  356 - 01168E00FFFFFFFC - move.l A0, -4(A6)
-  364 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
-  372 - 0120000000000000 - move.l #0, D0
-  380 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
-  388 - 0120000000000000 - move.l #0, D0
-  396 - 01060E00FFFFFFF0 - move.l D0, -16(A6)
-  ; wh_top_3:
-  404 - 0160E100FFFFFFF4 - move.l -12(A6), D1
-  412 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  420 - 14000100 - cmp.l D0, D1
-  424 - 552F000000000254 - bge @596
-  432 - 412F000000000018 - jsr @24
-  440 - 01060E00FFFFFFF0 - move.l D0, -16(A6)
-  448 - 0160E000FFFFFFF0 - move.l -16(A6), D0
-  456 - 14200000FFFFFFFF - cmp.l #4294967295, D0
-  464 - 512F0000000001E0 - bne @480
-  472 - 402F000000000254 - jmp @596
-  ; else_5:
-  480 - 0160E000FFFFFFF0 - move.l -16(A6), D0
-  488 - 142000000000000A - cmp.l #10, D0
-  496 - 512F000000000200 - bne @512
-  504 - 402F000000000254 - jmp @596
-  ; else_7:
-  512 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  520 - 01158F00 - move.l A0, -(A7)
-  524 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  532 - 01050F00 - move.l D0, -(A7)
-  536 - 0160E000FFFFFFF0 - move.l -16(A6), D0
-  544 - 01000100 - move.l D0, D1
-  548 - 0140F000 - move.l (A7)+, D0
-  552 - 0241F800 - movea.l (A7)+, A0
-  556 - 412F000000000070 - jsr @112
-  564 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  572 - 1020000000000001 - add.l #1, D0
-  580 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
-  588 - 402F000000000194 - jmp @404
-  ; wh_end_4:
-  596 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  604 - 01158F00 - move.l A0, -(A7)
-  608 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  616 - 0241F800 - movea.l (A7)+, A0
-  620 - 412F0000000000B0 - jsr @176
-  628 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  636 - 611FE000 - unlk A6
-  640 - 42FF0000 - rts
-  ; main:
-  644 - 60210E00FFFFFFF8 - link.l #4294967288, A6
-  652 - 01260E0000000000FFFFFFFC - move.l #0, -4(A6)
-  664 - 0120000000000000 - move.l #0, D0
-  672 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
-  680 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  688 - 01158F00 - move.l A0, -(A7)
-  692 - 0120000000000040 - move.l #64, D0
-  700 - 01050F00 - move.l D0, -(A7)
-  704 - 0140F000 - move.l (A7)+, D0
-  708 - 0241F800 - movea.l (A7)+, A0
-  712 - 412F00000000015C - jsr @348
-  720 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  728 - 412F0000000000B8 - jsr @184
-  736 - 611FE000 - unlk A6
-  740 - FFFF0000 - halt
+       0  402F000000000284                  jmp @644                    ; __entry
+       8  02210D00FFFF0004                  movea.l #4294901764, A5     ; __rt_write_char
+      16  01030D00                          move.l D0, (A5)             
+      20  42FF0000                          rts                         
+      24  02210D00FFFF0000                  movea.l #4294901760, A5     ; __rt_read_char
+      32  0130D000                          move.l (A5), D0             
+      36  42FF0000                          rts                         
+      40  01308000                          move.l (A0), D0             ; __rt_str_len
+      44  42FF0000                          rts                         
+      48  60210E00FFFFFFF8                  link.l #4294967288, A6      ; __rt_str_get
+      56  01061E00FFFFFFFC                  move.l D1, -4(A6)           
+      64  02118900                          movea.l A0, A1              
+      68  1021090000000004                  add.l #4, A1                
+      76  01000100                          move.l D0, D1               
+      80  1220010000000004                  mul.l #4, D1                
+      88  10011900                          add.l D1, A1                
+      92  01309000                          move.l (A1), D0             
+      96  0160E100FFFFFFFC                  move.l -4(A6), D1           
+     104  611FE000                          unlk A6                     
+     108  42FF0000                          rts                         
+     112  60210E00FFFFFFF8                  link.l #4294967288, A6      ; __rt_str_set
+     120  01062E00FFFFFFFC                  move.l D2, -4(A6)           
+     128  02118900                          movea.l A0, A1              
+     132  1021090000000004                  add.l #4, A1                
+     140  01000200                          move.l D0, D2               
+     144  1220020000000004                  mul.l #4, D2                
+     152  10012900                          add.l D2, A1                
+     156  01031900                          move.l D1, (A1)             
+     160  0160E200FFFFFFFC                  move.l -4(A6), D2           
+     168  611FE000                          unlk A6                     
+     172  42FF0000                          rts                         
+     176  01030800                          move.l D0, (A0)             ; __rt_str_set_len
+     180  42FF0000                          rts                         
+     184  60210E00FFFFFFF4                  link.l #4294967284, A6      ; print_str
+     192  01168E00FFFFFFFC                  move.l A0, -4(A6)           
+     200  0120000000000000                  move.l #0, D0               
+     208  01060E00FFFFFFF8                  move.l D0, -8(A6)           
+     216  0261E800FFFFFFFC                  movea.l -4(A6), A0          
+     224  412F000000000028                  jsr @40                     
+     232  01060E00FFFFFFF4                  move.l D0, -12(A6)          
+     240  0160E100FFFFFFF8                  move.l -8(A6), D1           ; wh_top_1
+     248  0160E000FFFFFFF4                  move.l -12(A6), D0          
+     256  14000100                          cmp.l D0, D1                
+     260  552F000000000154                  bge @340                    
+     268  0261E800FFFFFFFC                  movea.l -4(A6), A0          
+     276  01158F00                          move.l A0, -(A7)            
+     280  0160E000FFFFFFF8                  move.l -8(A6), D0           
+     288  0241F800                          movea.l (A7)+, A0           
+     292  412F000000000030                  jsr @48                     
+     300  412F000000000008                  jsr @8                      
+     308  0160E000FFFFFFF8                  move.l -8(A6), D0           
+     316  1020000000000001                  add.l #1, D0                
+     324  01060E00FFFFFFF8                  move.l D0, -8(A6)           
+     332  402F0000000000F0                  jmp @240                    
+     340  611FE000                          unlk A6                     ; wh_end_2
+     344  42FF0000                          rts                         
+     348  60210E00FFFFFFF0                  link.l #4294967280, A6      ; read_line
+     356  01168E00FFFFFFFC                  move.l A0, -4(A6)           
+     364  01060E00FFFFFFF8                  move.l D0, -8(A6)           
+     372  0120000000000000                  move.l #0, D0               
+     380  01060E00FFFFFFF4                  move.l D0, -12(A6)          
+     388  0120000000000000                  move.l #0, D0               
+     396  01060E00FFFFFFF0                  move.l D0, -16(A6)          
+     404  0160E100FFFFFFF4                  move.l -12(A6), D1          ; wh_top_3
+     412  0160E000FFFFFFF8                  move.l -8(A6), D0           
+     420  14000100                          cmp.l D0, D1                
+     424  552F000000000254                  bge @596                    
+     432  412F000000000018                  jsr @24                     
+     440  01060E00FFFFFFF0                  move.l D0, -16(A6)          
+     448  0160E000FFFFFFF0                  move.l -16(A6), D0          
+     456  14200000FFFFFFFF                  cmp.l #4294967295, D0       
+     464  512F0000000001E0                  bne @480                    
+     472  402F000000000254                  jmp @596                    
+     480  0160E000FFFFFFF0                  move.l -16(A6), D0          ; else_5
+     488  142000000000000A                  cmp.l #10, D0               
+     496  512F000000000200                  bne @512                    
+     504  402F000000000254                  jmp @596                    
+     512  0261E800FFFFFFFC                  movea.l -4(A6), A0          ; else_7
+     520  01158F00                          move.l A0, -(A7)            
+     524  0160E000FFFFFFF4                  move.l -12(A6), D0          
+     532  01050F00                          move.l D0, -(A7)            
+     536  0160E000FFFFFFF0                  move.l -16(A6), D0          
+     544  01000100                          move.l D0, D1               
+     548  0140F000                          move.l (A7)+, D0            
+     552  0241F800                          movea.l (A7)+, A0           
+     556  412F000000000070                  jsr @112                    
+     564  0160E000FFFFFFF4                  move.l -12(A6), D0          
+     572  1020000000000001                  add.l #1, D0                
+     580  01060E00FFFFFFF4                  move.l D0, -12(A6)          
+     588  402F000000000194                  jmp @404                    
+     596  0261E800FFFFFFFC                  movea.l -4(A6), A0          ; wh_end_4
+     604  01158F00                          move.l A0, -(A7)            
+     608  0160E000FFFFFFF4                  move.l -12(A6), D0          
+     616  0241F800                          movea.l (A7)+, A0           
+     620  412F0000000000B0                  jsr @176                    
+     628  0160E000FFFFFFF4                  move.l -12(A6), D0          
+     636  611FE000                          unlk A6                     
+     640  42FF0000                          rts                         
+     644  60210E00FFFFFFF8                  link.l #4294967288, A6      ; main
+     652  01260E0000000000FFFFFFFC          move.l #0, -4(A6)           
+     664  0120000000000000                  move.l #0, D0               
+     672  01060E00FFFFFFF8                  move.l D0, -8(A6)           
+     680  0261E800FFFFFFFC                  movea.l -4(A6), A0          
+     688  01158F00                          move.l A0, -(A7)            
+     692  0120000000000040                  move.l #64, D0              
+     700  01050F00                          move.l D0, -(A7)            
+     704  0140F000                          move.l (A7)+, D0            
+     708  0241F800                          movea.l (A7)+, A0           
+     712  412F00000000015C                  jsr @348                    
+     720  0261E800FFFFFFFC                  movea.l -4(A6), A0          
+     728  412F0000000000B8                  jsr @184                    
+     736  611FE000                          unlk A6                     
+     740  FFFF0000                          halt                        
