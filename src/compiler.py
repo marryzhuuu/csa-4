@@ -2166,6 +2166,7 @@ compiler.py — компилятор языка JavaLight (JL) в бинарны
   python compiler.py programs/sort.jl out/
 """
 
+
 def run(source_file: str, out_dir: str) -> None:
     compile_file(source_file, out_dir)
 

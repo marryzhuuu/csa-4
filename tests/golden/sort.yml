@@ -335,11 +335,11 @@ out_log: |
   DEBUG   emulator:run             ... ещё 5829 команд (используйте --trace-out для полного журнала)
 
 out_stdout: |
-  AST:    <tmpdir>\prog.ast
-  imem:   <tmpdir>\prog.imem  (2556 байт)
-  dmem:   <tmpdir>\prog.dmem  (1112 байт)
-  labels: <tmpdir>\prog.labels
-  lst:    <tmpdir>\prog.lst
+  AST:    <tmpdir>/prog.ast
+  imem:   <tmpdir>/prog.imem  (2556 байт)
+  dmem:   <tmpdir>/prog.dmem  (1112 байт)
+  labels: <tmpdir>/prog.labels
+  lst:    <tmpdir>/prog.lst
 
   Точка входа main: 1724
   ============================================================

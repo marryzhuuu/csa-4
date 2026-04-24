@@ -6,15 +6,14 @@ emulator.py — потактовый эмулятор M68k-inspired Harvard ISA 
 """
 
 import argparse
+import logging
 import os
 import struct
 import sys
-import logging
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "asm"))
-from config import DEFAULT_OUT_DIR, IO_IN, IO_OUT, DEFAULT_TRACE_LIMIT
+from config import DEFAULT_OUT_DIR, DEFAULT_TRACE_LIMIT, IO_IN, IO_OUT
 from isa import AM, Op
-
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  CPU
@@ -22,7 +21,7 @@ from isa import AM, Op
 
 
 class CPU:
-    """Потактовая модель процессора. Может использоваться как модуль."""
+    """Потактовая модель процессора."""
 
     def __init__(
         self,
@@ -654,12 +653,7 @@ def run(target_code: str, target_data: str, target_labels: str, input_stream: st
         print(f"Ошибка чтения файла: {e}", file=sys.stderr)
         sys.exit(1)
 
-    cpu = CPU(
-        code,
-        data,
-        tokens,
-        True
-    )
+    cpu = CPU(code, data, tokens, True)
     cpu.run(start_pc=start_pc)
     print("=== Вывод программы ===")
     print(cpu.output_str(), end="")
@@ -678,9 +672,6 @@ def run(target_code: str, target_data: str, target_labels: str, input_stream: st
         logging.debug(f"  ... ещё {total - limit} команд (используйте --trace-out для полного журнала)")
 
 
-
-
-    
 def main():
     parser = build_parser()
     args = parser.parse_args()

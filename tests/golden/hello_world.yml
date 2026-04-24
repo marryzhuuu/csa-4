@@ -220,11 +220,11 @@ out_log: |
   DEBUG   emulator:run               84 | cy=    522 | rts                                 | D0=00000020 D1=00000006 D2=00000000 D3=00000000 A6=0001DFF4 A7=0001DFE8 [N0Z0V0C0]
   DEBUG   emulator:run             ... ещё 212 команд (используйте --trace-out для полного журнала)
 out_stdout: |
-  AST:    <tmpdir>\prog.ast
-  imem:   <tmpdir>\prog.imem  (284 байт)
-  dmem:   <tmpdir>\prog.dmem  (60 байт)
-  labels: <tmpdir>\prog.labels
-  lst:    <tmpdir>\prog.lst
+  AST:    <tmpdir>/prog.ast
+  imem:   <tmpdir>/prog.imem  (284 байт)
+  dmem:   <tmpdir>/prog.dmem  (60 байт)
+  labels: <tmpdir>/prog.labels
+  lst:    <tmpdir>/prog.lst
 
   Точка входа main: 252
   ============================================================
