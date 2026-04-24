@@ -129,12 +129,12 @@ in_stdin: |
   10 1 2 3 4 0 9 8 7 6 5
 
 out_log: |
-  DEBUG   emulator:run           === Трассировка (первые 200 из 6029 команд) ===
+  DEBUG   emulator:run           === Трассировка (первые 200 из 6030 команд) ===
   DEBUG   emulator:run              addr |   cycle | мнемоника                           | регистры
   DEBUG   emulator:run             ------------------------------------------------------------------------------------------------------------
-  DEBUG   emulator:run             1724 | cy=      2 | link A6, #-20                       | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C0]
-  DEBUG   emulator:run             1732 | cy=      6 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C0]
-  DEBUG   emulator:run             1744 | cy=      9 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C0]
+  DEBUG   emulator:run                0 | cy=      2 | jmp @1732 T                         | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=00000000 A7=0001E000 [N0Z0V0C0]
+  DEBUG   emulator:run             1732 | cy=      5 | link A6, #-20                       | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C0]
+  DEBUG   emulator:run             1740 | cy=      9 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C0]
   DEBUG   emulator:run             1752 | cy=     12 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C0]
   DEBUG   emulator:run             1760 | cy=     15 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C0]
   DEBUG   emulator:run             1768 | cy=     18 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C0]
@@ -142,206 +142,205 @@ out_log: |
   DEBUG   emulator:run             1784 | cy=     24 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C0]
   DEBUG   emulator:run             1792 | cy=     27 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C0]
   DEBUG   emulator:run             1800 | cy=     30 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C0]
-  DEBUG   emulator:run             1808 | cy=     33 | jsr @460 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE4 [N0Z1V0C0]
-  DEBUG   emulator:run              460 | cy=     36 | link A6, #-12                       | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              468 | cy=     39 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run             1808 | cy=     33 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C0]
+  DEBUG   emulator:run             1816 | cy=     36 | jsr @468 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE4 [N0Z1V0C0]
+  DEBUG   emulator:run              468 | cy=     39 | link A6, #-12                       | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
   DEBUG   emulator:run              476 | cy=     42 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
   DEBUG   emulator:run              484 | cy=     45 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
   DEBUG   emulator:run              492 | cy=     48 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
   DEBUG   emulator:run              500 | cy=     51 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
   DEBUG   emulator:run              508 | cy=     54 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              516 | cy=     57 | jsr @16 T                           | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z1V0C0]
-  DEBUG   emulator:run               16 | cy=     60 | movea -> A5                         | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z1V0C0]
-  DEBUG   emulator:run               24 | cy=     62 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
-  DEBUG   emulator:run               28 | cy=     64 | rts                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              524 | cy=     67 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              516 | cy=     57 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              524 | cy=     60 | jsr @24 T                           | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z1V0C0]
+  DEBUG   emulator:run               24 | cy=     63 | movea -> A5                         | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z1V0C0]
+  DEBUG   emulator:run               32 | cy=     65 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
+  DEBUG   emulator:run               36 | cy=     67 | rts                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
   DEBUG   emulator:run              532 | cy=     70 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              540 | cy=     73 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              548 | cy=     76 | beq @572 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              556 | cy=     79 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              564 | cy=     82 | jmp @580 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              580 | cy=     85 | cmp                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              588 | cy=     88 | bne @676 F                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              596 | cy=     91 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              604 | cy=     94 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              612 | cy=     97 | beq @636 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              620 | cy=    100 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              628 | cy=    103 | jmp @644 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              644 | cy=    106 | cmp                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              652 | cy=    109 | bne @676 F                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              660 | cy=    112 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              668 | cy=    115 | jmp @684 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              684 | cy=    118 | cmp                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              692 | cy=    121 | bne @724 F                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              700 | cy=    124 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              708 | cy=    127 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              716 | cy=    130 | bne @748 T                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              748 | cy=    133 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              756 | cy=    136 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              764 | cy=    139 | bne @804 T                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              804 | cy=    142 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              812 | cy=    145 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              820 | cy=    148 | blt @932 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              828 | cy=    151 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              836 | cy=    154 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
-  DEBUG   emulator:run              844 | cy=    157 | bgt @932 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
-  DEBUG   emulator:run              852 | cy=    160 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C1]
-  DEBUG   emulator:run              860 | cy=    163 | mul                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C1]
-  DEBUG   emulator:run              868 | cy=    165 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z1V0C1]
-  DEBUG   emulator:run              872 | cy=    168 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C1]
-  DEBUG   emulator:run              880 | cy=    171 | sub                                 | D0=00000001 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
-  DEBUG   emulator:run              888 | cy=    173 | move.l                              | D0=00000001 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              892 | cy=    175 | add                                 | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              896 | cy=    177 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              900 | cy=    180 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              908 | cy=    183 | jsr @16 T                           | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
-  DEBUG   emulator:run               16 | cy=    186 | movea -> A5                         | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
-  DEBUG   emulator:run               24 | cy=    188 | move.l                              | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
-  DEBUG   emulator:run               28 | cy=    190 | rts                                 | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              916 | cy=    193 | move.l                              | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              924 | cy=    196 | jmp @804 T                          | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              804 | cy=    199 | move.l                              | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              812 | cy=    202 | cmp                                 | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              820 | cy=    205 | blt @932 F                          | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
-  DEBUG   emulator:run              828 | cy=    208 | move.l                              | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              836 | cy=    211 | cmp                                 | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
-  DEBUG   emulator:run              844 | cy=    214 | bgt @932 F                          | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
-  DEBUG   emulator:run              852 | cy=    217 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C1]
-  DEBUG   emulator:run              860 | cy=    220 | mul                                 | D0=0000000A D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C1]
-  DEBUG   emulator:run              868 | cy=    222 | move.l                              | D0=0000000A D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C1]
-  DEBUG   emulator:run              872 | cy=    225 | move.l                              | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C1]
-  DEBUG   emulator:run              880 | cy=    228 | sub                                 | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z1V0C0]
-  DEBUG   emulator:run              888 | cy=    230 | move.l                              | D0=00000000 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              892 | cy=    232 | add                                 | D0=00000000 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              896 | cy=    234 | move.l                              | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              900 | cy=    237 | move.l                              | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              908 | cy=    240 | jsr @16 T                           | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
-  DEBUG   emulator:run               16 | cy=    243 | movea -> A5                         | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
-  DEBUG   emulator:run               24 | cy=    245 | move.l                              | D0=00000020 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
-  DEBUG   emulator:run               28 | cy=    247 | rts                                 | D0=00000020 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              916 | cy=    250 | move.l                              | D0=00000020 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              924 | cy=    253 | jmp @804 T                          | D0=00000020 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              804 | cy=    256 | move.l                              | D0=00000020 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
-  DEBUG   emulator:run              812 | cy=    259 | cmp                                 | D0=00000020 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
-  DEBUG   emulator:run              820 | cy=    262 | blt @932 T                          | D0=00000020 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
-  DEBUG   emulator:run              932 | cy=    265 | move.l                              | D0=00000000 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C1]
-  DEBUG   emulator:run              940 | cy=    268 | cmp                                 | D0=00000000 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
-  DEBUG   emulator:run              948 | cy=    271 | bne @996 T                          | D0=00000000 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
-  DEBUG   emulator:run              996 | cy=    274 | move.l                              | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C1]
-  DEBUG   emulator:run             1004 | cy=    276 | unlk A6                             | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE4 [N0Z0V0C1]
-  DEBUG   emulator:run             1008 | cy=    278 | rts                                 | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C1]
-  DEBUG   emulator:run             1816 | cy=    281 | move.l                              | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C1]
-  DEBUG   emulator:run             1824 | cy=    284 | move.l                              | D0=00000000 D1=0000000A D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C1]
+  DEBUG   emulator:run              540 | cy=     73 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              548 | cy=     76 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              556 | cy=     79 | beq @580 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              564 | cy=     82 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              572 | cy=     85 | jmp @588 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              588 | cy=     88 | cmp                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              596 | cy=     91 | bne @684 F                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              604 | cy=     94 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              612 | cy=     97 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              620 | cy=    100 | beq @644 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              628 | cy=    103 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              636 | cy=    106 | jmp @652 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              652 | cy=    109 | cmp                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              660 | cy=    112 | bne @684 F                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              668 | cy=    115 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              676 | cy=    118 | jmp @692 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              692 | cy=    121 | cmp                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              700 | cy=    124 | bne @732 F                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              708 | cy=    127 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              716 | cy=    130 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              724 | cy=    133 | bne @756 T                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              756 | cy=    136 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              764 | cy=    139 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              772 | cy=    142 | bne @812 T                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              812 | cy=    145 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              820 | cy=    148 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              828 | cy=    151 | blt @940 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              836 | cy=    154 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              844 | cy=    157 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
+  DEBUG   emulator:run              852 | cy=    160 | bgt @940 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
+  DEBUG   emulator:run              860 | cy=    163 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C1]
+  DEBUG   emulator:run              868 | cy=    166 | mul                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C1]
+  DEBUG   emulator:run              876 | cy=    168 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z1V0C1]
+  DEBUG   emulator:run              880 | cy=    171 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C1]
+  DEBUG   emulator:run              888 | cy=    174 | sub                                 | D0=00000001 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
+  DEBUG   emulator:run              896 | cy=    176 | move.l                              | D0=00000001 D1=00000000 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              900 | cy=    178 | add                                 | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              904 | cy=    180 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              908 | cy=    183 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              916 | cy=    186 | jsr @24 T                           | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
+  DEBUG   emulator:run               24 | cy=    189 | movea -> A5                         | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
+  DEBUG   emulator:run               32 | cy=    191 | move.l                              | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
+  DEBUG   emulator:run               36 | cy=    193 | rts                                 | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              924 | cy=    196 | move.l                              | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              932 | cy=    199 | jmp @812 T                          | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              812 | cy=    202 | move.l                              | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              820 | cy=    205 | cmp                                 | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              828 | cy=    208 | blt @940 F                          | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C0]
+  DEBUG   emulator:run              836 | cy=    211 | move.l                              | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              844 | cy=    214 | cmp                                 | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
+  DEBUG   emulator:run              852 | cy=    217 | bgt @940 F                          | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
+  DEBUG   emulator:run              860 | cy=    220 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C1]
+  DEBUG   emulator:run              868 | cy=    223 | mul                                 | D0=0000000A D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C1]
+  DEBUG   emulator:run              876 | cy=    225 | move.l                              | D0=0000000A D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C1]
+  DEBUG   emulator:run              880 | cy=    228 | move.l                              | D0=00000030 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C1]
+  DEBUG   emulator:run              888 | cy=    231 | sub                                 | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z1V0C0]
+  DEBUG   emulator:run              896 | cy=    233 | move.l                              | D0=00000000 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              900 | cy=    235 | add                                 | D0=00000000 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              904 | cy=    237 | move.l                              | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              908 | cy=    240 | move.l                              | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              916 | cy=    243 | jsr @24 T                           | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
+  DEBUG   emulator:run               24 | cy=    246 | movea -> A5                         | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
+  DEBUG   emulator:run               32 | cy=    248 | move.l                              | D0=00000020 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD0 [N0Z0V0C0]
+  DEBUG   emulator:run               36 | cy=    250 | rts                                 | D0=00000020 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              924 | cy=    253 | move.l                              | D0=00000020 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              932 | cy=    256 | jmp @812 T                          | D0=00000020 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              812 | cy=    259 | move.l                              | D0=00000020 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C0]
+  DEBUG   emulator:run              820 | cy=    262 | cmp                                 | D0=00000020 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
+  DEBUG   emulator:run              828 | cy=    265 | blt @940 T                          | D0=00000020 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
+  DEBUG   emulator:run              940 | cy=    268 | move.l                              | D0=00000000 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z1V0C1]
+  DEBUG   emulator:run              948 | cy=    271 | cmp                                 | D0=00000000 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
+  DEBUG   emulator:run              956 | cy=    274 | bne @1004 T                         | D0=00000000 D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N1Z0V0C1]
+  DEBUG   emulator:run             1004 | cy=    277 | move.l                              | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD4 [N0Z0V0C1]
+  DEBUG   emulator:run             1012 | cy=    279 | unlk A6                             | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE4 [N0Z0V0C1]
+  DEBUG   emulator:run             1016 | cy=    281 | rts                                 | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C1]
+  DEBUG   emulator:run             1824 | cy=    284 | move.l                              | D0=0000000A D1=0000000A D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C1]
   DEBUG   emulator:run             1832 | cy=    287 | move.l                              | D0=00000000 D1=0000000A D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C1]
-  DEBUG   emulator:run             1840 | cy=    290 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C1]
-  DEBUG   emulator:run             1848 | cy=    293 | move.l                              | D0=0000000A D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C1]
-  DEBUG   emulator:run             1856 | cy=    295 | cmp                                 | D0=0000000A D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N1Z0V0C1]
-  DEBUG   emulator:run             1860 | cy=    298 | bge @1952 F                         | D0=0000000A D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N1Z0V0C1]
-  DEBUG   emulator:run             1868 | cy=    301 | movea -> A0                         | D0=0000000A D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N1Z0V0C1]
-  DEBUG   emulator:run             1876 | cy=    303 | move.l                              | D0=0000000A D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE4 [N0Z1V0C1]
-  DEBUG   emulator:run             1880 | cy=    306 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE4 [N0Z1V0C1]
-  DEBUG   emulator:run             1888 | cy=    308 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE0 [N0Z1V0C1]
-  DEBUG   emulator:run             1892 | cy=    311 | jsr @460 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFDC [N0Z1V0C1]
-  DEBUG   emulator:run              460 | cy=    314 | link A6, #-12                       | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
-  DEBUG   emulator:run              468 | cy=    317 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
+  DEBUG   emulator:run             1840 | cy=    290 | move.l                              | D0=00000000 D1=0000000A D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C1]
+  DEBUG   emulator:run             1848 | cy=    293 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C1]
+  DEBUG   emulator:run             1856 | cy=    296 | move.l                              | D0=0000000A D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C1]
+  DEBUG   emulator:run             1864 | cy=    298 | cmp                                 | D0=0000000A D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N1Z0V0C1]
+  DEBUG   emulator:run             1868 | cy=    301 | bge @1960 F                         | D0=0000000A D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N1Z0V0C1]
+  DEBUG   emulator:run             1876 | cy=    304 | movea -> A0                         | D0=0000000A D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N1Z0V0C1]
+  DEBUG   emulator:run             1884 | cy=    306 | move.l                              | D0=0000000A D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE4 [N0Z1V0C1]
+  DEBUG   emulator:run             1888 | cy=    309 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE4 [N0Z1V0C1]
+  DEBUG   emulator:run             1896 | cy=    311 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE0 [N0Z1V0C1]
+  DEBUG   emulator:run             1900 | cy=    314 | jsr @468 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFDC [N0Z1V0C1]
+  DEBUG   emulator:run              468 | cy=    317 | link A6, #-12                       | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
   DEBUG   emulator:run              476 | cy=    320 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
   DEBUG   emulator:run              484 | cy=    323 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
   DEBUG   emulator:run              492 | cy=    326 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
   DEBUG   emulator:run              500 | cy=    329 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
   DEBUG   emulator:run              508 | cy=    332 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
-  DEBUG   emulator:run              516 | cy=    335 | jsr @16 T                           | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z1V0C1]
-  DEBUG   emulator:run               16 | cy=    338 | movea -> A5                         | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z1V0C1]
-  DEBUG   emulator:run               24 | cy=    340 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z0V0C1]
-  DEBUG   emulator:run               28 | cy=    342 | rts                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C1]
-  DEBUG   emulator:run              524 | cy=    345 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C1]
+  DEBUG   emulator:run              516 | cy=    335 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
+  DEBUG   emulator:run              524 | cy=    338 | jsr @24 T                           | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z1V0C1]
+  DEBUG   emulator:run               24 | cy=    341 | movea -> A5                         | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z1V0C1]
+  DEBUG   emulator:run               32 | cy=    343 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z0V0C1]
+  DEBUG   emulator:run               36 | cy=    345 | rts                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C1]
   DEBUG   emulator:run              532 | cy=    348 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C1]
-  DEBUG   emulator:run              540 | cy=    351 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              548 | cy=    354 | beq @572 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              556 | cy=    357 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
-  DEBUG   emulator:run              564 | cy=    360 | jmp @580 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
-  DEBUG   emulator:run              580 | cy=    363 | cmp                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
-  DEBUG   emulator:run              588 | cy=    366 | bne @676 F                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
-  DEBUG   emulator:run              596 | cy=    369 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              604 | cy=    372 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              612 | cy=    375 | beq @636 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              620 | cy=    378 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
-  DEBUG   emulator:run              628 | cy=    381 | jmp @644 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
-  DEBUG   emulator:run              644 | cy=    384 | cmp                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
-  DEBUG   emulator:run              652 | cy=    387 | bne @676 F                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
-  DEBUG   emulator:run              660 | cy=    390 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
-  DEBUG   emulator:run              668 | cy=    393 | jmp @684 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
-  DEBUG   emulator:run              684 | cy=    396 | cmp                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
-  DEBUG   emulator:run              692 | cy=    399 | bne @724 F                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
-  DEBUG   emulator:run              700 | cy=    402 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              708 | cy=    405 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              716 | cy=    408 | bne @748 T                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              748 | cy=    411 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              756 | cy=    414 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              764 | cy=    417 | bne @804 T                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              804 | cy=    420 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              812 | cy=    423 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              820 | cy=    426 | blt @932 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              828 | cy=    429 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              836 | cy=    432 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N1Z0V0C1]
-  DEBUG   emulator:run              844 | cy=    435 | bgt @932 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N1Z0V0C1]
-  DEBUG   emulator:run              852 | cy=    438 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
-  DEBUG   emulator:run              860 | cy=    441 | mul                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
-  DEBUG   emulator:run              868 | cy=    443 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z1V0C1]
-  DEBUG   emulator:run              872 | cy=    446 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z0V0C1]
-  DEBUG   emulator:run              880 | cy=    449 | sub                                 | D0=00000001 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z0V0C0]
-  DEBUG   emulator:run              888 | cy=    451 | move.l                              | D0=00000001 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
-  DEBUG   emulator:run              892 | cy=    453 | add                                 | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              896 | cy=    455 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              900 | cy=    458 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              908 | cy=    461 | jsr @16 T                           | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z0V0C0]
-  DEBUG   emulator:run               16 | cy=    464 | movea -> A5                         | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z0V0C0]
-  DEBUG   emulator:run               24 | cy=    466 | move.l                              | D0=00000020 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z0V0C0]
-  DEBUG   emulator:run               28 | cy=    468 | rts                                 | D0=00000020 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              916 | cy=    471 | move.l                              | D0=00000020 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              924 | cy=    474 | jmp @804 T                          | D0=00000020 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              804 | cy=    477 | move.l                              | D0=00000020 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
-  DEBUG   emulator:run              812 | cy=    480 | cmp                                 | D0=00000020 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N1Z0V0C1]
-  DEBUG   emulator:run              820 | cy=    483 | blt @932 T                          | D0=00000020 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N1Z0V0C1]
-  DEBUG   emulator:run              932 | cy=    486 | move.l                              | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
-  DEBUG   emulator:run              940 | cy=    489 | cmp                                 | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N1Z0V0C1]
-  DEBUG   emulator:run              948 | cy=    492 | bne @996 T                          | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N1Z0V0C1]
-  DEBUG   emulator:run              996 | cy=    495 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C1]
-  DEBUG   emulator:run             1004 | cy=    497 | unlk A6                             | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFDC [N0Z0V0C1]
-  DEBUG   emulator:run             1008 | cy=    499 | rts                                 | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE0 [N0Z0V0C1]
-  DEBUG   emulator:run             1900 | cy=    501 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE0 [N0Z0V0C1]
-  DEBUG   emulator:run             1904 | cy=    503 | move.l                              | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE4 [N0Z1V0C1]
-  DEBUG   emulator:run             1908 | cy=    505 | movea -> A0                         | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C1]
-  DEBUG   emulator:run             1912 | cy=    508 | jsr @104 T                          | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE4 [N0Z1V0C1]
-  DEBUG   emulator:run              104 | cy=    511 | link A6, #-8                        | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z1V0C1]
-  DEBUG   emulator:run              112 | cy=    514 | move.l                              | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z1V0C1]
-  DEBUG   emulator:run              120 | cy=    516 | movea -> A1                         | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z1V0C1]
-  DEBUG   emulator:run              124 | cy=    519 | add                                 | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z0V0C0]
-  DEBUG   emulator:run              132 | cy=    521 | move.l                              | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z1V0C0]
-  DEBUG   emulator:run              136 | cy=    524 | mul                                 | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z1V0C0]
-  DEBUG   emulator:run              144 | cy=    526 | add                                 | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z0V0C0]
-  DEBUG   emulator:run              148 | cy=    528 | move.l                              | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z0V0C0]
-  DEBUG   emulator:run              152 | cy=    531 | move.l                              | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z1V0C0]
-  DEBUG   emulator:run              160 | cy=    533 | unlk A6                             | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE4 [N0Z1V0C0]
-  DEBUG   emulator:run              164 | cy=    535 | rts                                 | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C0]
-  DEBUG   emulator:run             1920 | cy=    538 | move.l                              | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C0]
-  DEBUG   emulator:run             1928 | cy=    541 | add                                 | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C0]
-  DEBUG   emulator:run             1936 | cy=    544 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C0]
-  DEBUG   emulator:run             1944 | cy=    547 | jmp @1840 T                         | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C0]
-  DEBUG   emulator:run             1840 | cy=    550 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C0]
-  DEBUG   emulator:run             1848 | cy=    553 | move.l                              | D0=0000000A D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C0]
-  DEBUG   emulator:run             1856 | cy=    555 | cmp                                 | D0=0000000A D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N1Z0V0C1]
-  DEBUG   emulator:run             1860 | cy=    558 | bge @1952 F                         | D0=0000000A D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N1Z0V0C1]
-  DEBUG   emulator:run             1868 | cy=    561 | movea -> A0                         | D0=0000000A D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N1Z0V0C1]
-  DEBUG   emulator:run             ... ещё 5829 команд (используйте --trace-out для полного журнала)
+  DEBUG   emulator:run              540 | cy=    351 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C1]
+  DEBUG   emulator:run              548 | cy=    354 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              556 | cy=    357 | beq @580 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              564 | cy=    360 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
+  DEBUG   emulator:run              572 | cy=    363 | jmp @588 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
+  DEBUG   emulator:run              588 | cy=    366 | cmp                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
+  DEBUG   emulator:run              596 | cy=    369 | bne @684 F                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
+  DEBUG   emulator:run              604 | cy=    372 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              612 | cy=    375 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              620 | cy=    378 | beq @644 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              628 | cy=    381 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
+  DEBUG   emulator:run              636 | cy=    384 | jmp @652 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
+  DEBUG   emulator:run              652 | cy=    387 | cmp                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
+  DEBUG   emulator:run              660 | cy=    390 | bne @684 F                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
+  DEBUG   emulator:run              668 | cy=    393 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
+  DEBUG   emulator:run              676 | cy=    396 | jmp @692 T                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
+  DEBUG   emulator:run              692 | cy=    399 | cmp                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
+  DEBUG   emulator:run              700 | cy=    402 | bne @732 F                          | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
+  DEBUG   emulator:run              708 | cy=    405 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              716 | cy=    408 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              724 | cy=    411 | bne @756 T                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              756 | cy=    414 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              764 | cy=    417 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              772 | cy=    420 | bne @812 T                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              812 | cy=    423 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              820 | cy=    426 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              828 | cy=    429 | blt @940 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              836 | cy=    432 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              844 | cy=    435 | cmp                                 | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N1Z0V0C1]
+  DEBUG   emulator:run              852 | cy=    438 | bgt @940 F                          | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N1Z0V0C1]
+  DEBUG   emulator:run              860 | cy=    441 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
+  DEBUG   emulator:run              868 | cy=    444 | mul                                 | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
+  DEBUG   emulator:run              876 | cy=    446 | move.l                              | D0=00000000 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z1V0C1]
+  DEBUG   emulator:run              880 | cy=    449 | move.l                              | D0=00000031 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z0V0C1]
+  DEBUG   emulator:run              888 | cy=    452 | sub                                 | D0=00000001 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z0V0C0]
+  DEBUG   emulator:run              896 | cy=    454 | move.l                              | D0=00000001 D1=00000000 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C0]
+  DEBUG   emulator:run              900 | cy=    456 | add                                 | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              904 | cy=    458 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              908 | cy=    461 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              916 | cy=    464 | jsr @24 T                           | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z0V0C0]
+  DEBUG   emulator:run               24 | cy=    467 | movea -> A5                         | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z0V0C0]
+  DEBUG   emulator:run               32 | cy=    469 | move.l                              | D0=00000020 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFC8 [N0Z0V0C0]
+  DEBUG   emulator:run               36 | cy=    471 | rts                                 | D0=00000020 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              924 | cy=    474 | move.l                              | D0=00000020 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              932 | cy=    477 | jmp @812 T                          | D0=00000020 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              812 | cy=    480 | move.l                              | D0=00000020 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C0]
+  DEBUG   emulator:run              820 | cy=    483 | cmp                                 | D0=00000020 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N1Z0V0C1]
+  DEBUG   emulator:run              828 | cy=    486 | blt @940 T                          | D0=00000020 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N1Z0V0C1]
+  DEBUG   emulator:run              940 | cy=    489 | move.l                              | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z1V0C1]
+  DEBUG   emulator:run              948 | cy=    492 | cmp                                 | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N1Z0V0C1]
+  DEBUG   emulator:run              956 | cy=    495 | bne @1004 T                         | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N1Z0V0C1]
+  DEBUG   emulator:run             1004 | cy=    498 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFD8 A7=0001DFCC [N0Z0V0C1]
+  DEBUG   emulator:run             1012 | cy=    500 | unlk A6                             | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFDC [N0Z0V0C1]
+  DEBUG   emulator:run             1016 | cy=    502 | rts                                 | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE0 [N0Z0V0C1]
+  DEBUG   emulator:run             1908 | cy=    504 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE0 [N0Z0V0C1]
+  DEBUG   emulator:run             1912 | cy=    506 | move.l                              | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE4 [N0Z1V0C1]
+  DEBUG   emulator:run             1916 | cy=    508 | movea -> A0                         | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C1]
+  DEBUG   emulator:run             1920 | cy=    511 | jsr @112 T                          | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE4 [N0Z1V0C1]
+  DEBUG   emulator:run              112 | cy=    514 | link A6, #-8                        | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z1V0C1]
+  DEBUG   emulator:run              120 | cy=    517 | move.l                              | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z1V0C1]
+  DEBUG   emulator:run              128 | cy=    519 | movea -> A1                         | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z1V0C1]
+  DEBUG   emulator:run              132 | cy=    522 | add                                 | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z0V0C0]
+  DEBUG   emulator:run              140 | cy=    524 | move.l                              | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z1V0C0]
+  DEBUG   emulator:run              144 | cy=    527 | mul                                 | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z1V0C0]
+  DEBUG   emulator:run              152 | cy=    529 | add                                 | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z0V0C0]
+  DEBUG   emulator:run              156 | cy=    531 | move.l                              | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z0V0C0]
+  DEBUG   emulator:run              160 | cy=    534 | move.l                              | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFE0 A7=0001DFD8 [N0Z1V0C0]
+  DEBUG   emulator:run              168 | cy=    536 | unlk A6                             | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE4 [N0Z1V0C0]
+  DEBUG   emulator:run              172 | cy=    538 | rts                                 | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C0]
+  DEBUG   emulator:run             1928 | cy=    541 | move.l                              | D0=00000000 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z1V0C0]
+  DEBUG   emulator:run             1936 | cy=    544 | add                                 | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C0]
+  DEBUG   emulator:run             1944 | cy=    547 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C0]
+  DEBUG   emulator:run             1952 | cy=    550 | jmp @1848 T                         | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C0]
+  DEBUG   emulator:run             1848 | cy=    553 | move.l                              | D0=00000001 D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C0]
+  DEBUG   emulator:run             1856 | cy=    556 | move.l                              | D0=0000000A D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N0Z0V0C0]
+  DEBUG   emulator:run             1864 | cy=    558 | cmp                                 | D0=0000000A D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N1Z0V0C1]
+  DEBUG   emulator:run             1868 | cy=    561 | bge @1960 F                         | D0=0000000A D1=00000001 D2=00000000 D3=00000000 A6=0001DFFC A7=0001DFE8 [N1Z0V0C1]
+  DEBUG   emulator:run             ... ещё 5830 команд (используйте --trace-out для полного журнала)
 
 out_stdout: |
   AST:    <tmpdir>/prog.ast
-  imem:   <tmpdir>/prog.imem  (2556 байт)
+  imem:   <tmpdir>/prog.imem  (2564 байт)
   dmem:   <tmpdir>/prog.dmem  (1112 байт)
-  labels: <tmpdir>/prog.labels
   lst:    <tmpdir>/prog.lst
 
-  Точка входа main: 1724
+  Точка входа: PC=0 → JMP main (1732)
   ============================================================
   === Вывод программы ===
   Sorted: 0 1 2 3 4 5 6 7 8 9
@@ -349,51 +348,51 @@ out_stdout: |
   Avg: 4
 
 out_code: !!binary |
-  AiENAP//AAQBAw0AQv8AAAIhDQD//wAAATDQAEL/AAABMIAAQv8AAGAhDgD////4AQYeAP////wC
-  EYkAECEJAAAAAAQBAAEAEiABAAAAAAQQARkAATCQAAFg4QD////8YR/gAEL/AABgIQ4A////+AEG
-  LgD////8AhGJABAhCQAAAAAEAQACABIgAgAAAAAEEAEpAAEDGQABYOIA/////GEf4ABC/wAAAQMI
-  AEL/AABgIQ4A////+AEGDgD////8ASAAAAAAAAABBg4A////+AFg4AD////8FCAAAAAAAABVLwAA
-  AAABIAEgAAAAAAAtQS8AAAAAAAABIAAAAAAAAAEFDwABYOAA/////AFA8QARAAEAAQAQAAEGDgD/
-  ///8AWDgAP////wUIAAAAAAAAFEvAAAAAAFQASAAAAAAADBBLwAAAAAAAGEf4ABC/wAAAWDgAP//
-  //wUIAAAAAAAClIvAAAAAAGEAWDgAP////wBIAEAAAAAChMAEABBLwAAAAAAsAEgAAAAAAAwAQUP
-  AAFg4AD////8AQABAAEgAgAAAAAKEwAhABIAIQARABAAAUDxABAAAQABABAAQS8AAAAAAABhH+AA
-  Qv8AAGAhDgD////0ASAAAAAAAAABBg4A/////AEgAAAAAAAAAQYOAP////gBIAAAAAAAAAEGDgD/
-  ///0QS8AAAAAABABBg4A/////AFg4AD////8FCAAAAAAACBQLwAAAAACPAEgAAAAAAAAQC8AAAAA
-  AkQBIAAAAAAAARQgAAAAAAAAUS8AAAAAAqQBYOAA/////BQgAAAAAAAKUC8AAAAAAnwBIAAAAAAA
-  AEAvAAAAAAKEASAAAAAAAAEUIAAAAAAAAFEvAAAAAAKkASAAAAAAAABALwAAAAACrAEgAAAAAAAB
-  FCAAAAAAAABRLwAAAAAC1AFg4AD////8FCAAAAAAAA1RLwAAAAAC7EEvAAAAAAAQAQYOAP////xA
-  LwAAAAACFAFg4AD////8FCAAAAAAAC1RLwAAAAADJAEgAAAAAAABAQYOAP////RBLwAAAAAAEAEG
-  DgD////8AWDgAP////wUIAAAAAAAMFIvAAAAAAOkAWDgAP////wUIAAAAAAAOVMvAAAAAAOkAWDg
-  AP////gSIAAAAAAACgEFDwABYOAA/////BEgAAAAAAAwAUDxABAAAQABABAAAQYOAP////hBLwAA
-  AAAAEAEGDgD////8QC8AAAAAAyQBYOAA////9BQgAAAAAAABUS8AAAAAA+QBIAAAAAAAAAEFDwAB
-  YOAA////+AFA8QARAAEAAQAQAAEGDgD////4AWDgAP////hhH+AAQv8AAGAhDgD////0ARaOAP//
-  //wBIAAAAAAAAAEGDgD////4AmHoAP////xBLwAAAAAAIAEGDgD////0AWDhAP////gBYOAA////
-  9BQAAQBVLwAAAAAEkAJh6AD////8ARWPAAFg4AD////4AkH4AEEvAAAAAAAoQS8AAAAAAAABYOAA
-  ////+BAgAAAAAAABAQYOAP////hALwAAAAAELGEf4ABC/wAAYCEOAP///+QBFo4A/////AEGDgD/
-  ///4ASAAAAAAAAABBg4A////9AEgAAAAAAAAAQYOAP////ABIAAAAAAAAAEGDgD////sASAAAAAA
-  AAABBg4A////6AEgAAAAAAAAAQYOAP///+QBYOAA////9AEFDwABYOAA////+BEgAAAAAAABAUDx
-  ABQAAQBVLwAAAAAGtAEgAAAAAAAAAQYOAP////ABYOAA////8AEFDwABYOAA////+BEgAAAAAAAB
-  AQUPAAFg4AD////0AUDxABEAAQABABAAAUDxABQAAQBVLwAAAAAGlAJh6AD////8ARWPAAFg4AD/
-  ///wAkH4AEEvAAAAAAAoAQYOAP///+gCYegA/////AEVjwABYOAA////8BAgAAAAAAABAkH4AEEv
-  AAAAAAAoAQYOAP///+QBYOEA////6AFg4AD////kFAABAFQvAAAAAAZ0AWDgAP///+gBBg4A////
-  7AJh6AD////8ARWPAAFg4AD////wAQUPAAFg4AD////kAQABAAFA8AACQfgAQS8AAAAAAGgCYegA
-  /////AEVjwABYOAA////8BAgAAAAAAABAQUPAAFg4AD////sAQABAAFA8AACQfgAQS8AAAAAAGgB
-  YOAA////8BAgAAAAAAABAQYOAP////BALwAAAAAFPAFg4AD////0ECAAAAAAAAEBBg4A////9EAv
-  AAAAAAUAYR/gAEL/AABgIQ4A////7AEmDgAAAAAA/////AEgAAAAAAAAAQYOAP////gBIAAAAAAA
-  AAEGDgD////0ASAAAAAAAAABBg4A////8AEgAAAAAAAAAQYOAP///+xBLwAAAAABzAEGDgD////4
-  ASAAAAAAAAABBg4A////9AFg4QD////0AWDgAP////gUAAEAVS8AAAAAB6ACYegA/////AEVjwAB
-  YOAA////9AEFDwBBLwAAAAABzAEAAQABQPAAAkH4AEEvAAAAAABoAWDgAP////QQIAAAAAAAAQEG
-  DgD////0QC8AAAAABzACYegA/////AEVjwABYOAA////+AJB+ABBLwAAAAAAqAJh6AD////8ARWP
-  AAFg4AD////4AQUPAAFA8AACQfgAQS8AAAAABJgBIAAAAAAAAAEGDgD////wASAAAAAAAAABBg4A
-  ////9AFg4QD////0AWDgAP////gUAAEAVS8AAAAACIQBYOAA////8AEFDwACYegA/////AEVjwAB
-  YOAA////9AJB+ABBLwAAAAAAKAFA8QAQAAEAAQAQAAEGDgD////wAWDgAP////QQIAAAAAAAAQEG
-  DgD////0QC8AAAAACAgBYOAA////+BQgAAAAAAAAVC8AAAAACMQBYOAA////8AEFDwABYOAA////
-  +AFA8QATAAEAAQAQAAEGDgD////sAiEIAAAABARBLwAAAAAD9AEgAAAAAAAAAQYOAP////QBYOEA
-  ////9AFg4AD////4FAABAFUvAAAAAAmEAmHoAP////wBFY8AAWDgAP////QCQfgAQS8AAAAAAChB
-  LwAAAAAAsAFg4AD////0AQUPAAFg4AD////4ESAAAAAAAAEBQPEAFAABAFUvAAAAAAlkASAAAAAA
-  ACBBLwAAAAAAAAFg4AD////0ECAAAAAAAAEBBg4A////9EAvAAAAAAjkASAAAAAAAApBLwAAAAAA
-  AAIhCAAAAAQoQS8AAAAAA/QBYOAA////8EEvAAAAAACwASAAAAAAAApBLwAAAAAAAAIhCAAAAARA
-  QS8AAAAAA/QBYOAA////7EEvAAAAAACwASAAAAAAAApBLwAAAAAAAGEf4AD//wAA
+  QC8AAAAABsQCIQ0A//8ABAEDDQBC/wAAAiENAP//AAABMNAAQv8AAAEwgABC/wAAYCEOAP////gB
+  Bh4A/////AIRiQAQIQkAAAAABAEAAQASIAEAAAAABBABGQABMJAAAWDhAP////xhH+AAQv8AAGAh
+  DgD////4AQYuAP////wCEYkAECEJAAAAAAQBAAIAEiACAAAAAAQQASkAAQMZAAFg4gD////8YR/g
+  AEL/AAABAwgAQv8AAGAhDgD////4AQYOAP////wBIAAAAAAAAAEGDgD////4AWDgAP////wUIAAA
+  AAAAAFUvAAAAAAEoASAAAAAAAC1BLwAAAAAACAEgAAAAAAAAAQUPAAFg4AD////8AUDxABEAAQAB
+  ABAAAQYOAP////wBYOAA/////BQgAAAAAAAAUS8AAAAAAVgBIAAAAAAAMEEvAAAAAAAIYR/gAEL/
+  AAABYOAA/////BQgAAAAAAAKUi8AAAAAAYwBYOAA/////AEgAQAAAAAKEwAQAEEvAAAAAAC4ASAA
+  AAAAADABBQ8AAWDgAP////wBAAEAASACAAAAAAoTACEAEgAhABEAEAABQPEAEAABAAEAEABBLwAA
+  AAAACGEf4ABC/wAAYCEOAP////QBIAAAAAAAAAEGDgD////8ASAAAAAAAAABBg4A////+AEgAAAA
+  AAAAAQYOAP////RBLwAAAAAAGAEGDgD////8AWDgAP////wUIAAAAAAAIFAvAAAAAAJEASAAAAAA
+  AABALwAAAAACTAEgAAAAAAABFCAAAAAAAABRLwAAAAACrAFg4AD////8FCAAAAAAAApQLwAAAAAC
+  hAEgAAAAAAAAQC8AAAAAAowBIAAAAAAAARQgAAAAAAAAUS8AAAAAAqwBIAAAAAAAAEAvAAAAAAK0
+  ASAAAAAAAAEUIAAAAAAAAFEvAAAAAALcAWDgAP////wUIAAAAAAADVEvAAAAAAL0QS8AAAAAABgB
+  Bg4A/////EAvAAAAAAIcAWDgAP////wUIAAAAAAALVEvAAAAAAMsASAAAAAAAAEBBg4A////9EEv
+  AAAAAAAYAQYOAP////wBYOAA/////BQgAAAAAAAwUi8AAAAAA6wBYOAA/////BQgAAAAAAA5Uy8A
+  AAAAA6wBYOAA////+BIgAAAAAAAKAQUPAAFg4AD////8ESAAAAAAADABQPEAEAABAAEAEAABBg4A
+  ////+EEvAAAAAAAYAQYOAP////xALwAAAAADLAFg4AD////0FCAAAAAAAAFRLwAAAAAD7AEgAAAA
+  AAAAAQUPAAFg4AD////4AUDxABEAAQABABAAAQYOAP////gBYOAA////+GEf4ABC/wAAYCEOAP//
+  //QBFo4A/////AEgAAAAAAAAAQYOAP////gCYegA/////EEvAAAAAAAoAQYOAP////QBYOEA////
+  +AFg4AD////0FAABAFUvAAAAAASYAmHoAP////wBFY8AAWDgAP////gCQfgAQS8AAAAAADBBLwAA
+  AAAACAFg4AD////4ECAAAAAAAAEBBg4A////+EAvAAAAAAQ0YR/gAEL/AABgIQ4A////5AEWjgD/
+  ///8AQYOAP////gBIAAAAAAAAAEGDgD////0ASAAAAAAAAABBg4A////8AEgAAAAAAAAAQYOAP//
+  /+wBIAAAAAAAAAEGDgD////oASAAAAAAAAABBg4A////5AFg4AD////0AQUPAAFg4AD////4ESAA
+  AAAAAAEBQPEAFAABAFUvAAAAAAa8ASAAAAAAAAABBg4A////8AFg4AD////wAQUPAAFg4AD////4
+  ESAAAAAAAAEBBQ8AAWDgAP////QBQPEAEQABAAEAEAABQPEAFAABAFUvAAAAAAacAmHoAP////wB
+  FY8AAWDgAP////ACQfgAQS8AAAAAADABBg4A////6AJh6AD////8ARWPAAFg4AD////wECAAAAAA
+  AAECQfgAQS8AAAAAADABBg4A////5AFg4QD////oAWDgAP///+QUAAEAVC8AAAAABnwBYOAA////
+  6AEGDgD////sAmHoAP////wBFY8AAWDgAP////ABBQ8AAWDgAP///+QBAAEAAUDwAAJB+ABBLwAA
+  AAAAcAJh6AD////8ARWPAAFg4AD////wECAAAAAAAAEBBQ8AAWDgAP///+wBAAEAAUDwAAJB+ABB
+  LwAAAAAAcAFg4AD////wECAAAAAAAAEBBg4A////8EAvAAAAAAVEAWDgAP////QQIAAAAAAAAQEG
+  DgD////0QC8AAAAABQhhH+AAQv8AAGAhDgD////sASYOAAAAAAD////8ASAAAAAAAAABBg4A////
+  +AEgAAAAAAAAAQYOAP////QBIAAAAAAAAAEGDgD////wASAAAAAAAAABBg4A////7EEvAAAAAAHU
+  AQYOAP////gBIAAAAAAAAAEGDgD////0AWDhAP////QBYOAA////+BQAAQBVLwAAAAAHqAJh6AD/
+  ///8ARWPAAFg4AD////0AQUPAEEvAAAAAAHUAQABAAFA8AACQfgAQS8AAAAAAHABYOAA////9BAg
+  AAAAAAABAQYOAP////RALwAAAAAHOAJh6AD////8ARWPAAFg4AD////4AkH4AEEvAAAAAACwAmHo
+  AP////wBFY8AAWDgAP////gBBQ8AAUDwAAJB+ABBLwAAAAAEoAEgAAAAAAAAAQYOAP////ABIAAA
+  AAAAAAEGDgD////0AWDhAP////QBYOAA////+BQAAQBVLwAAAAAIjAFg4AD////wAQUPAAJh6AD/
+  ///8ARWPAAFg4AD////0AkH4AEEvAAAAAAAwAUDxABAAAQABABAAAQYOAP////ABYOAA////9BAg
+  AAAAAAABAQYOAP////RALwAAAAAIEAFg4AD////4FCAAAAAAAABULwAAAAAIzAFg4AD////wAQUP
+  AAFg4AD////4AUDxABMAAQABABAAAQYOAP///+wCIQgAAAAEBEEvAAAAAAP8ASAAAAAAAAABBg4A
+  ////9AFg4QD////0AWDgAP////gUAAEAVS8AAAAACYwCYegA/////AEVjwABYOAA////9AJB+ABB
+  LwAAAAAAMEEvAAAAAAC4AWDgAP////QBBQ8AAWDgAP////gRIAAAAAAAAQFA8QAUAAEAVS8AAAAA
+  CWwBIAAAAAAAIEEvAAAAAAAIAWDgAP////QQIAAAAAAAAQEGDgD////0QC8AAAAACOwBIAAAAAAA
+  CkEvAAAAAAAIAiEIAAAABChBLwAAAAAD/AFg4AD////wQS8AAAAAALgBIAAAAAAACkEvAAAAAAAI
+  AiEIAAAABEBBLwAAAAAD/AFg4AD////sQS8AAAAAALgBIAAAAAAACkEvAAAAAAAIYR/gAP//AAA=
 
 out_data: !!binary |
   AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -418,419 +417,466 @@ out_data: !!binary |
   OgAAACAAAAAFAAAAQQAAAHYAAABnAAAAOgAAACA=
 
 out_code_hex: |
+  ; Таблица меток:
+  ;        0  __entry
+  ;        8  __rt_write_char
+  ;       24  __rt_read_char
+  ;       40  __rt_str_len
+  ;       48  __rt_str_get
+  ;      112  __rt_str_set
+  ;      176  __rt_str_set_len
+  ;      184  write_int
+  ;      296  else_1
+  ;      344  else_3
+  ;      396  else_5
+  ;      468  read_int
+  ;      540  wh_top_7
+  ;      580  cmp_t_12
+  ;      588  cmp_e_13
+  ;      644  cmp_t_14
+  ;      652  cmp_e_15
+  ;      684  or_t_10
+  ;      692  or_e_11
+  ;      732  or_ok_9
+  ;      756  wh_end_8
+  ;      812  else_16
+  ;      812  wh_top_18
+  ;      940  wh_end_19
+  ;     1004  else_20
+  ;     1020  print_str
+  ;     1076  wh_top_22
+  ;     1176  wh_end_23
+  ;     1184  bubble_sort
+  ;     1288  wh_top_24
+  ;     1348  wh_top_26
+  ;     1660  else_28
+  ;     1692  wh_end_27
+  ;     1724  wh_end_25
+  ;     1732  main
+  ;     1848  wh_top_30
+  ;     1960  wh_end_31
+  ;     2064  wh_top_32
+  ;     2188  wh_end_33
+  ;     2252  else_34
+  ;     2284  wh_top_36
+  ;     2412  else_38
+  ;     2444  wh_end_37
+  ;
+  ; __entry:
+  0 - 402F0000000006C4 - jmp @1732
   ; __rt_write_char:
-  0 - 02210D00FFFF0004 - movea.l #4294901764, A5
-  8 - 01030D00 - move.l D0, (A5)
-  12 - 42FF0000 - rts
+  8 - 02210D00FFFF0004 - movea.l #4294901764, A5
+  16 - 01030D00 - move.l D0, (A5)
+  20 - 42FF0000 - rts
   ; __rt_read_char:
-  16 - 02210D00FFFF0000 - movea.l #4294901760, A5
-  24 - 0130D000 - move.l (A5), D0
-  28 - 42FF0000 - rts
-  ; __rt_str_len:
-  32 - 01308000 - move.l (A0), D0
+  24 - 02210D00FFFF0000 - movea.l #4294901760, A5
+  32 - 0130D000 - move.l (A5), D0
   36 - 42FF0000 - rts
+  ; __rt_str_len:
+  40 - 01308000 - move.l (A0), D0
+  44 - 42FF0000 - rts
   ; __rt_str_get:
-  40 - 60210E00FFFFFFF8 - link.l #4294967288, A6
-  48 - 01061E00FFFFFFFC - move.l D1, -4(A6)
-  56 - 02118900 - movea.l A0, A1
-  60 - 1021090000000004 - add.l #4, A1
-  68 - 01000100 - move.l D0, D1
-  72 - 1220010000000004 - mul.l #4, D1
-  80 - 10011900 - add.l D1, A1
-  84 - 01309000 - move.l (A1), D0
-  88 - 0160E100FFFFFFFC - move.l -4(A6), D1
-  96 - 611FE000 - unlk A6
-  100 - 42FF0000 - rts
+  48 - 60210E00FFFFFFF8 - link.l #4294967288, A6
+  56 - 01061E00FFFFFFFC - move.l D1, -4(A6)
+  64 - 02118900 - movea.l A0, A1
+  68 - 1021090000000004 - add.l #4, A1
+  76 - 01000100 - move.l D0, D1
+  80 - 1220010000000004 - mul.l #4, D1
+  88 - 10011900 - add.l D1, A1
+  92 - 01309000 - move.l (A1), D0
+  96 - 0160E100FFFFFFFC - move.l -4(A6), D1
+  104 - 611FE000 - unlk A6
+  108 - 42FF0000 - rts
   ; __rt_str_set:
-  104 - 60210E00FFFFFFF8 - link.l #4294967288, A6
-  112 - 01062E00FFFFFFFC - move.l D2, -4(A6)
-  120 - 02118900 - movea.l A0, A1
-  124 - 1021090000000004 - add.l #4, A1
-  132 - 01000200 - move.l D0, D2
-  136 - 1220020000000004 - mul.l #4, D2
-  144 - 10012900 - add.l D2, A1
-  148 - 01031900 - move.l D1, (A1)
-  152 - 0160E200FFFFFFFC - move.l -4(A6), D2
-  160 - 611FE000 - unlk A6
-  164 - 42FF0000 - rts
-  ; __rt_str_set_len:
-  168 - 01030800 - move.l D0, (A0)
+  112 - 60210E00FFFFFFF8 - link.l #4294967288, A6
+  120 - 01062E00FFFFFFFC - move.l D2, -4(A6)
+  128 - 02118900 - movea.l A0, A1
+  132 - 1021090000000004 - add.l #4, A1
+  140 - 01000200 - move.l D0, D2
+  144 - 1220020000000004 - mul.l #4, D2
+  152 - 10012900 - add.l D2, A1
+  156 - 01031900 - move.l D1, (A1)
+  160 - 0160E200FFFFFFFC - move.l -4(A6), D2
+  168 - 611FE000 - unlk A6
   172 - 42FF0000 - rts
+  ; __rt_str_set_len:
+  176 - 01030800 - move.l D0, (A0)
+  180 - 42FF0000 - rts
   ; write_int:
-  176 - 60210E00FFFFFFF8 - link.l #4294967288, A6
-  184 - 01060E00FFFFFFFC - move.l D0, -4(A6)
-  192 - 0120000000000000 - move.l #0, D0
-  200 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
-  208 - 0160E000FFFFFFFC - move.l -4(A6), D0
-  216 - 1420000000000000 - cmp.l #0, D0
-  224 - 552F000000000120 - bge @288
-  232 - 012000000000002D - move.l #45, D0
-  240 - 412F000000000000 - jsr @0
-  248 - 0120000000000000 - move.l #0, D0
-  256 - 01050F00 - move.l D0, -(A7)
-  260 - 0160E000FFFFFFFC - move.l -4(A6), D0
-  268 - 0140F100 - move.l (A7)+, D1
-  272 - 11000100 - sub.l D0, D1
-  276 - 01001000 - move.l D1, D0
-  280 - 01060E00FFFFFFFC - move.l D0, -4(A6)
+  184 - 60210E00FFFFFFF8 - link.l #4294967288, A6
+  192 - 01060E00FFFFFFFC - move.l D0, -4(A6)
+  200 - 0120000000000000 - move.l #0, D0
+  208 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
+  216 - 0160E000FFFFFFFC - move.l -4(A6), D0
+  224 - 1420000000000000 - cmp.l #0, D0
+  232 - 552F000000000128 - bge @296
+  240 - 012000000000002D - move.l #45, D0
+  248 - 412F000000000008 - jsr @8
+  256 - 0120000000000000 - move.l #0, D0
+  264 - 01050F00 - move.l D0, -(A7)
+  268 - 0160E000FFFFFFFC - move.l -4(A6), D0
+  276 - 0140F100 - move.l (A7)+, D1
+  280 - 11000100 - sub.l D0, D1
+  284 - 01001000 - move.l D1, D0
+  288 - 01060E00FFFFFFFC - move.l D0, -4(A6)
   ; else_1:
-  288 - 0160E000FFFFFFFC - move.l -4(A6), D0
-  296 - 1420000000000000 - cmp.l #0, D0
-  304 - 512F000000000150 - bne @336
-  312 - 0120000000000030 - move.l #48, D0
-  320 - 412F000000000000 - jsr @0
-  328 - 611FE000 - unlk A6
-  332 - 42FF0000 - rts
+  296 - 0160E000FFFFFFFC - move.l -4(A6), D0
+  304 - 1420000000000000 - cmp.l #0, D0
+  312 - 512F000000000158 - bne @344
+  320 - 0120000000000030 - move.l #48, D0
+  328 - 412F000000000008 - jsr @8
+  336 - 611FE000 - unlk A6
+  340 - 42FF0000 - rts
   ; else_3:
-  336 - 0160E000FFFFFFFC - move.l -4(A6), D0
-  344 - 142000000000000A - cmp.l #10, D0
-  352 - 522F000000000184 - blt @388
-  360 - 0160E000FFFFFFFC - move.l -4(A6), D0
-  368 - 012001000000000A - move.l #10, D1
-  376 - 13001000 - div.l D1, D0
-  380 - 412F0000000000B0 - jsr @176
+  344 - 0160E000FFFFFFFC - move.l -4(A6), D0
+  352 - 142000000000000A - cmp.l #10, D0
+  360 - 522F00000000018C - blt @396
+  368 - 0160E000FFFFFFFC - move.l -4(A6), D0
+  376 - 012001000000000A - move.l #10, D1
+  384 - 13001000 - div.l D1, D0
+  388 - 412F0000000000B8 - jsr @184
   ; else_5:
-  388 - 0120000000000030 - move.l #48, D0
-  396 - 01050F00 - move.l D0, -(A7)
-  400 - 0160E000FFFFFFFC - move.l -4(A6), D0
-  408 - 01000100 - move.l D0, D1
-  412 - 012002000000000A - move.l #10, D2
-  420 - 13002100 - div.l D2, D1
-  424 - 12002100 - mul.l D2, D1
-  428 - 11001000 - sub.l D1, D0
-  432 - 0140F100 - move.l (A7)+, D1
-  436 - 10000100 - add.l D0, D1
-  440 - 01001000 - move.l D1, D0
-  444 - 412F000000000000 - jsr @0
-  452 - 611FE000 - unlk A6
-  456 - 42FF0000 - rts
+  396 - 0120000000000030 - move.l #48, D0
+  404 - 01050F00 - move.l D0, -(A7)
+  408 - 0160E000FFFFFFFC - move.l -4(A6), D0
+  416 - 01000100 - move.l D0, D1
+  420 - 012002000000000A - move.l #10, D2
+  428 - 13002100 - div.l D2, D1
+  432 - 12002100 - mul.l D2, D1
+  436 - 11001000 - sub.l D1, D0
+  440 - 0140F100 - move.l (A7)+, D1
+  444 - 10000100 - add.l D0, D1
+  448 - 01001000 - move.l D1, D0
+  452 - 412F000000000008 - jsr @8
+  460 - 611FE000 - unlk A6
+  464 - 42FF0000 - rts
   ; read_int:
-  460 - 60210E00FFFFFFF4 - link.l #4294967284, A6
-  468 - 0120000000000000 - move.l #0, D0
-  476 - 01060E00FFFFFFFC - move.l D0, -4(A6)
-  484 - 0120000000000000 - move.l #0, D0
-  492 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
-  500 - 0120000000000000 - move.l #0, D0
-  508 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
-  516 - 412F000000000010 - jsr @16
-  524 - 01060E00FFFFFFFC - move.l D0, -4(A6)
+  468 - 60210E00FFFFFFF4 - link.l #4294967284, A6
+  476 - 0120000000000000 - move.l #0, D0
+  484 - 01060E00FFFFFFFC - move.l D0, -4(A6)
+  492 - 0120000000000000 - move.l #0, D0
+  500 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
+  508 - 0120000000000000 - move.l #0, D0
+  516 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
+  524 - 412F000000000018 - jsr @24
+  532 - 01060E00FFFFFFFC - move.l D0, -4(A6)
   ; wh_top_7:
-  532 - 0160E000FFFFFFFC - move.l -4(A6), D0
-  540 - 1420000000000020 - cmp.l #32, D0
-  548 - 502F00000000023C - beq @572
-  556 - 0120000000000000 - move.l #0, D0
-  564 - 402F000000000244 - jmp @580
+  540 - 0160E000FFFFFFFC - move.l -4(A6), D0
+  548 - 1420000000000020 - cmp.l #32, D0
+  556 - 502F000000000244 - beq @580
+  564 - 0120000000000000 - move.l #0, D0
+  572 - 402F00000000024C - jmp @588
   ; cmp_t_12:
-  572 - 0120000000000001 - move.l #1, D0
+  580 - 0120000000000001 - move.l #1, D0
   ; cmp_e_13:
-  580 - 1420000000000000 - cmp.l #0, D0
-  588 - 512F0000000002A4 - bne @676
-  596 - 0160E000FFFFFFFC - move.l -4(A6), D0
-  604 - 142000000000000A - cmp.l #10, D0
-  612 - 502F00000000027C - beq @636
-  620 - 0120000000000000 - move.l #0, D0
-  628 - 402F000000000284 - jmp @644
+  588 - 1420000000000000 - cmp.l #0, D0
+  596 - 512F0000000002AC - bne @684
+  604 - 0160E000FFFFFFFC - move.l -4(A6), D0
+  612 - 142000000000000A - cmp.l #10, D0
+  620 - 502F000000000284 - beq @644
+  628 - 0120000000000000 - move.l #0, D0
+  636 - 402F00000000028C - jmp @652
   ; cmp_t_14:
-  636 - 0120000000000001 - move.l #1, D0
+  644 - 0120000000000001 - move.l #1, D0
   ; cmp_e_15:
-  644 - 1420000000000000 - cmp.l #0, D0
-  652 - 512F0000000002A4 - bne @676
-  660 - 0120000000000000 - move.l #0, D0
-  668 - 402F0000000002AC - jmp @684
+  652 - 1420000000000000 - cmp.l #0, D0
+  660 - 512F0000000002AC - bne @684
+  668 - 0120000000000000 - move.l #0, D0
+  676 - 402F0000000002B4 - jmp @692
   ; or_t_10:
-  676 - 0120000000000001 - move.l #1, D0
+  684 - 0120000000000001 - move.l #1, D0
   ; or_e_11:
-  684 - 1420000000000000 - cmp.l #0, D0
-  692 - 512F0000000002D4 - bne @724
-  700 - 0160E000FFFFFFFC - move.l -4(A6), D0
-  708 - 142000000000000D - cmp.l #13, D0
-  716 - 512F0000000002EC - bne @748
+  692 - 1420000000000000 - cmp.l #0, D0
+  700 - 512F0000000002DC - bne @732
+  708 - 0160E000FFFFFFFC - move.l -4(A6), D0
+  716 - 142000000000000D - cmp.l #13, D0
+  724 - 512F0000000002F4 - bne @756
   ; or_ok_9:
-  724 - 412F000000000010 - jsr @16
-  732 - 01060E00FFFFFFFC - move.l D0, -4(A6)
-  740 - 402F000000000214 - jmp @532
+  732 - 412F000000000018 - jsr @24
+  740 - 01060E00FFFFFFFC - move.l D0, -4(A6)
+  748 - 402F00000000021C - jmp @540
   ; wh_end_8:
-  748 - 0160E000FFFFFFFC - move.l -4(A6), D0
-  756 - 142000000000002D - cmp.l #45, D0
-  764 - 512F000000000324 - bne @804
-  772 - 0120000000000001 - move.l #1, D0
-  780 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
-  788 - 412F000000000010 - jsr @16
-  796 - 01060E00FFFFFFFC - move.l D0, -4(A6)
+  756 - 0160E000FFFFFFFC - move.l -4(A6), D0
+  764 - 142000000000002D - cmp.l #45, D0
+  772 - 512F00000000032C - bne @812
+  780 - 0120000000000001 - move.l #1, D0
+  788 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
+  796 - 412F000000000018 - jsr @24
+  804 - 01060E00FFFFFFFC - move.l D0, -4(A6)
   ; else_16:
   ; wh_top_18:
-  804 - 0160E000FFFFFFFC - move.l -4(A6), D0
-  812 - 1420000000000030 - cmp.l #48, D0
-  820 - 522F0000000003A4 - blt @932
-  828 - 0160E000FFFFFFFC - move.l -4(A6), D0
-  836 - 1420000000000039 - cmp.l #57, D0
-  844 - 532F0000000003A4 - bgt @932
-  852 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  860 - 122000000000000A - mul.l #10, D0
-  868 - 01050F00 - move.l D0, -(A7)
-  872 - 0160E000FFFFFFFC - move.l -4(A6), D0
-  880 - 1120000000000030 - sub.l #48, D0
-  888 - 0140F100 - move.l (A7)+, D1
-  892 - 10000100 - add.l D0, D1
-  896 - 01001000 - move.l D1, D0
-  900 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
-  908 - 412F000000000010 - jsr @16
-  916 - 01060E00FFFFFFFC - move.l D0, -4(A6)
-  924 - 402F000000000324 - jmp @804
+  812 - 0160E000FFFFFFFC - move.l -4(A6), D0
+  820 - 1420000000000030 - cmp.l #48, D0
+  828 - 522F0000000003AC - blt @940
+  836 - 0160E000FFFFFFFC - move.l -4(A6), D0
+  844 - 1420000000000039 - cmp.l #57, D0
+  852 - 532F0000000003AC - bgt @940
+  860 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  868 - 122000000000000A - mul.l #10, D0
+  876 - 01050F00 - move.l D0, -(A7)
+  880 - 0160E000FFFFFFFC - move.l -4(A6), D0
+  888 - 1120000000000030 - sub.l #48, D0
+  896 - 0140F100 - move.l (A7)+, D1
+  900 - 10000100 - add.l D0, D1
+  904 - 01001000 - move.l D1, D0
+  908 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
+  916 - 412F000000000018 - jsr @24
+  924 - 01060E00FFFFFFFC - move.l D0, -4(A6)
+  932 - 402F00000000032C - jmp @812
   ; wh_end_19:
-  932 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  940 - 1420000000000001 - cmp.l #1, D0
-  948 - 512F0000000003E4 - bne @996
-  956 - 0120000000000000 - move.l #0, D0
-  964 - 01050F00 - move.l D0, -(A7)
-  968 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  976 - 0140F100 - move.l (A7)+, D1
-  980 - 11000100 - sub.l D0, D1
-  984 - 01001000 - move.l D1, D0
-  988 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
+  940 - 0160E000FFFFFFF4 - move.l -12(A6), D0
+  948 - 1420000000000001 - cmp.l #1, D0
+  956 - 512F0000000003EC - bne @1004
+  964 - 0120000000000000 - move.l #0, D0
+  972 - 01050F00 - move.l D0, -(A7)
+  976 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  984 - 0140F100 - move.l (A7)+, D1
+  988 - 11000100 - sub.l D0, D1
+  992 - 01001000 - move.l D1, D0
+  996 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
   ; else_20:
-  996 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  1004 - 611FE000 - unlk A6
-  1008 - 42FF0000 - rts
+  1004 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  1012 - 611FE000 - unlk A6
+  1016 - 42FF0000 - rts
   ; print_str:
-  1012 - 60210E00FFFFFFF4 - link.l #4294967284, A6
-  1020 - 01168E00FFFFFFFC - move.l A0, -4(A6)
-  1028 - 0120000000000000 - move.l #0, D0
-  1036 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
-  1044 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  1052 - 412F000000000020 - jsr @32
-  1060 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
+  1020 - 60210E00FFFFFFF4 - link.l #4294967284, A6
+  1028 - 01168E00FFFFFFFC - move.l A0, -4(A6)
+  1036 - 0120000000000000 - move.l #0, D0
+  1044 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
+  1052 - 0261E800FFFFFFFC - movea.l -4(A6), A0
+  1060 - 412F000000000028 - jsr @40
+  1068 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
   ; wh_top_22:
-  1068 - 0160E100FFFFFFF8 - move.l -8(A6), D1
-  1076 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  1084 - 14000100 - cmp.l D0, D1
-  1088 - 552F000000000490 - bge @1168
-  1096 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  1104 - 01158F00 - move.l A0, -(A7)
-  1108 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  1116 - 0241F800 - movea.l (A7)+, A0
-  1120 - 412F000000000028 - jsr @40
-  1128 - 412F000000000000 - jsr @0
-  1136 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  1144 - 1020000000000001 - add.l #1, D0
-  1152 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
-  1160 - 402F00000000042C - jmp @1068
+  1076 - 0160E100FFFFFFF8 - move.l -8(A6), D1
+  1084 - 0160E000FFFFFFF4 - move.l -12(A6), D0
+  1092 - 14000100 - cmp.l D0, D1
+  1096 - 552F000000000498 - bge @1176
+  1104 - 0261E800FFFFFFFC - movea.l -4(A6), A0
+  1112 - 01158F00 - move.l A0, -(A7)
+  1116 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  1124 - 0241F800 - movea.l (A7)+, A0
+  1128 - 412F000000000030 - jsr @48
+  1136 - 412F000000000008 - jsr @8
+  1144 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  1152 - 1020000000000001 - add.l #1, D0
+  1160 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
+  1168 - 402F000000000434 - jmp @1076
   ; wh_end_23:
-  1168 - 611FE000 - unlk A6
-  1172 - 42FF0000 - rts
+  1176 - 611FE000 - unlk A6
+  1180 - 42FF0000 - rts
   ; bubble_sort:
-  1176 - 60210E00FFFFFFE4 - link.l #4294967268, A6
-  1184 - 01168E00FFFFFFFC - move.l A0, -4(A6)
-  1192 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
-  1200 - 0120000000000000 - move.l #0, D0
-  1208 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
-  1216 - 0120000000000000 - move.l #0, D0
-  1224 - 01060E00FFFFFFF0 - move.l D0, -16(A6)
-  1232 - 0120000000000000 - move.l #0, D0
-  1240 - 01060E00FFFFFFEC - move.l D0, -20(A6)
-  1248 - 0120000000000000 - move.l #0, D0
-  1256 - 01060E00FFFFFFE8 - move.l D0, -24(A6)
-  1264 - 0120000000000000 - move.l #0, D0
-  1272 - 01060E00FFFFFFE4 - move.l D0, -28(A6)
+  1184 - 60210E00FFFFFFE4 - link.l #4294967268, A6
+  1192 - 01168E00FFFFFFFC - move.l A0, -4(A6)
+  1200 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
+  1208 - 0120000000000000 - move.l #0, D0
+  1216 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
+  1224 - 0120000000000000 - move.l #0, D0
+  1232 - 01060E00FFFFFFF0 - move.l D0, -16(A6)
+  1240 - 0120000000000000 - move.l #0, D0
+  1248 - 01060E00FFFFFFEC - move.l D0, -20(A6)
+  1256 - 0120000000000000 - move.l #0, D0
+  1264 - 01060E00FFFFFFE8 - move.l D0, -24(A6)
+  1272 - 0120000000000000 - move.l #0, D0
+  1280 - 01060E00FFFFFFE4 - move.l D0, -28(A6)
   ; wh_top_24:
-  1280 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  1288 - 01050F00 - move.l D0, -(A7)
-  1292 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  1300 - 1120000000000001 - sub.l #1, D0
-  1308 - 0140F100 - move.l (A7)+, D1
-  1312 - 14000100 - cmp.l D0, D1
-  1316 - 552F0000000006B4 - bge @1716
-  1324 - 0120000000000000 - move.l #0, D0
-  1332 - 01060E00FFFFFFF0 - move.l D0, -16(A6)
+  1288 - 0160E000FFFFFFF4 - move.l -12(A6), D0
+  1296 - 01050F00 - move.l D0, -(A7)
+  1300 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  1308 - 1120000000000001 - sub.l #1, D0
+  1316 - 0140F100 - move.l (A7)+, D1
+  1320 - 14000100 - cmp.l D0, D1
+  1324 - 552F0000000006BC - bge @1724
+  1332 - 0120000000000000 - move.l #0, D0
+  1340 - 01060E00FFFFFFF0 - move.l D0, -16(A6)
   ; wh_top_26:
-  1340 - 0160E000FFFFFFF0 - move.l -16(A6), D0
-  1348 - 01050F00 - move.l D0, -(A7)
-  1352 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  1360 - 1120000000000001 - sub.l #1, D0
-  1368 - 01050F00 - move.l D0, -(A7)
-  1372 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  1380 - 0140F100 - move.l (A7)+, D1
-  1384 - 11000100 - sub.l D0, D1
-  1388 - 01001000 - move.l D1, D0
-  1392 - 0140F100 - move.l (A7)+, D1
-  1396 - 14000100 - cmp.l D0, D1
-  1400 - 552F000000000694 - bge @1684
-  1408 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  1416 - 01158F00 - move.l A0, -(A7)
-  1420 - 0160E000FFFFFFF0 - move.l -16(A6), D0
-  1428 - 0241F800 - movea.l (A7)+, A0
-  1432 - 412F000000000028 - jsr @40
-  1440 - 01060E00FFFFFFE8 - move.l D0, -24(A6)
-  1448 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  1456 - 01158F00 - move.l A0, -(A7)
-  1460 - 0160E000FFFFFFF0 - move.l -16(A6), D0
-  1468 - 1020000000000001 - add.l #1, D0
-  1476 - 0241F800 - movea.l (A7)+, A0
-  1480 - 412F000000000028 - jsr @40
-  1488 - 01060E00FFFFFFE4 - move.l D0, -28(A6)
-  1496 - 0160E100FFFFFFE8 - move.l -24(A6), D1
-  1504 - 0160E000FFFFFFE4 - move.l -28(A6), D0
-  1512 - 14000100 - cmp.l D0, D1
-  1516 - 542F000000000674 - ble @1652
-  1524 - 0160E000FFFFFFE8 - move.l -24(A6), D0
-  1532 - 01060E00FFFFFFEC - move.l D0, -20(A6)
-  1540 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  1548 - 01158F00 - move.l A0, -(A7)
-  1552 - 0160E000FFFFFFF0 - move.l -16(A6), D0
-  1560 - 01050F00 - move.l D0, -(A7)
-  1564 - 0160E000FFFFFFE4 - move.l -28(A6), D0
-  1572 - 01000100 - move.l D0, D1
-  1576 - 0140F000 - move.l (A7)+, D0
-  1580 - 0241F800 - movea.l (A7)+, A0
-  1584 - 412F000000000068 - jsr @104
-  1592 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  1600 - 01158F00 - move.l A0, -(A7)
-  1604 - 0160E000FFFFFFF0 - move.l -16(A6), D0
-  1612 - 1020000000000001 - add.l #1, D0
-  1620 - 01050F00 - move.l D0, -(A7)
-  1624 - 0160E000FFFFFFEC - move.l -20(A6), D0
-  1632 - 01000100 - move.l D0, D1
-  1636 - 0140F000 - move.l (A7)+, D0
-  1640 - 0241F800 - movea.l (A7)+, A0
-  1644 - 412F000000000068 - jsr @104
+  1348 - 0160E000FFFFFFF0 - move.l -16(A6), D0
+  1356 - 01050F00 - move.l D0, -(A7)
+  1360 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  1368 - 1120000000000001 - sub.l #1, D0
+  1376 - 01050F00 - move.l D0, -(A7)
+  1380 - 0160E000FFFFFFF4 - move.l -12(A6), D0
+  1388 - 0140F100 - move.l (A7)+, D1
+  1392 - 11000100 - sub.l D0, D1
+  1396 - 01001000 - move.l D1, D0
+  1400 - 0140F100 - move.l (A7)+, D1
+  1404 - 14000100 - cmp.l D0, D1
+  1408 - 552F00000000069C - bge @1692
+  1416 - 0261E800FFFFFFFC - movea.l -4(A6), A0
+  1424 - 01158F00 - move.l A0, -(A7)
+  1428 - 0160E000FFFFFFF0 - move.l -16(A6), D0
+  1436 - 0241F800 - movea.l (A7)+, A0
+  1440 - 412F000000000030 - jsr @48
+  1448 - 01060E00FFFFFFE8 - move.l D0, -24(A6)
+  1456 - 0261E800FFFFFFFC - movea.l -4(A6), A0
+  1464 - 01158F00 - move.l A0, -(A7)
+  1468 - 0160E000FFFFFFF0 - move.l -16(A6), D0
+  1476 - 1020000000000001 - add.l #1, D0
+  1484 - 0241F800 - movea.l (A7)+, A0
+  1488 - 412F000000000030 - jsr @48
+  1496 - 01060E00FFFFFFE4 - move.l D0, -28(A6)
+  1504 - 0160E100FFFFFFE8 - move.l -24(A6), D1
+  1512 - 0160E000FFFFFFE4 - move.l -28(A6), D0
+  1520 - 14000100 - cmp.l D0, D1
+  1524 - 542F00000000067C - ble @1660
+  1532 - 0160E000FFFFFFE8 - move.l -24(A6), D0
+  1540 - 01060E00FFFFFFEC - move.l D0, -20(A6)
+  1548 - 0261E800FFFFFFFC - movea.l -4(A6), A0
+  1556 - 01158F00 - move.l A0, -(A7)
+  1560 - 0160E000FFFFFFF0 - move.l -16(A6), D0
+  1568 - 01050F00 - move.l D0, -(A7)
+  1572 - 0160E000FFFFFFE4 - move.l -28(A6), D0
+  1580 - 01000100 - move.l D0, D1
+  1584 - 0140F000 - move.l (A7)+, D0
+  1588 - 0241F800 - movea.l (A7)+, A0
+  1592 - 412F000000000070 - jsr @112
+  1600 - 0261E800FFFFFFFC - movea.l -4(A6), A0
+  1608 - 01158F00 - move.l A0, -(A7)
+  1612 - 0160E000FFFFFFF0 - move.l -16(A6), D0
+  1620 - 1020000000000001 - add.l #1, D0
+  1628 - 01050F00 - move.l D0, -(A7)
+  1632 - 0160E000FFFFFFEC - move.l -20(A6), D0
+  1640 - 01000100 - move.l D0, D1
+  1644 - 0140F000 - move.l (A7)+, D0
+  1648 - 0241F800 - movea.l (A7)+, A0
+  1652 - 412F000000000070 - jsr @112
   ; else_28:
-  1652 - 0160E000FFFFFFF0 - move.l -16(A6), D0
-  1660 - 1020000000000001 - add.l #1, D0
-  1668 - 01060E00FFFFFFF0 - move.l D0, -16(A6)
-  1676 - 402F00000000053C - jmp @1340
+  1660 - 0160E000FFFFFFF0 - move.l -16(A6), D0
+  1668 - 1020000000000001 - add.l #1, D0
+  1676 - 01060E00FFFFFFF0 - move.l D0, -16(A6)
+  1684 - 402F000000000544 - jmp @1348
   ; wh_end_27:
-  1684 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  1692 - 1020000000000001 - add.l #1, D0
-  1700 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
-  1708 - 402F000000000500 - jmp @1280
+  1692 - 0160E000FFFFFFF4 - move.l -12(A6), D0
+  1700 - 1020000000000001 - add.l #1, D0
+  1708 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
+  1716 - 402F000000000508 - jmp @1288
   ; wh_end_25:
-  1716 - 611FE000 - unlk A6
-  1720 - 42FF0000 - rts
+  1724 - 611FE000 - unlk A6
+  1728 - 42FF0000 - rts
   ; main:
-  1724 - 60210E00FFFFFFEC - link.l #4294967276, A6
-  1732 - 01260E0000000000FFFFFFFC - move.l #0, -4(A6)
-  1744 - 0120000000000000 - move.l #0, D0
-  1752 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
-  1760 - 0120000000000000 - move.l #0, D0
-  1768 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
-  1776 - 0120000000000000 - move.l #0, D0
-  1784 - 01060E00FFFFFFF0 - move.l D0, -16(A6)
-  1792 - 0120000000000000 - move.l #0, D0
-  1800 - 01060E00FFFFFFEC - move.l D0, -20(A6)
-  1808 - 412F0000000001CC - jsr @460
-  1816 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
-  1824 - 0120000000000000 - move.l #0, D0
-  1832 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
+  1732 - 60210E00FFFFFFEC - link.l #4294967276, A6
+  1740 - 01260E0000000000FFFFFFFC - move.l #0, -4(A6)
+  1752 - 0120000000000000 - move.l #0, D0
+  1760 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
+  1768 - 0120000000000000 - move.l #0, D0
+  1776 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
+  1784 - 0120000000000000 - move.l #0, D0
+  1792 - 01060E00FFFFFFF0 - move.l D0, -16(A6)
+  1800 - 0120000000000000 - move.l #0, D0
+  1808 - 01060E00FFFFFFEC - move.l D0, -20(A6)
+  1816 - 412F0000000001D4 - jsr @468
+  1824 - 01060E00FFFFFFF8 - move.l D0, -8(A6)
+  1832 - 0120000000000000 - move.l #0, D0
+  1840 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
   ; wh_top_30:
-  1840 - 0160E100FFFFFFF4 - move.l -12(A6), D1
-  1848 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  1856 - 14000100 - cmp.l D0, D1
-  1860 - 552F0000000007A0 - bge @1952
-  1868 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  1876 - 01158F00 - move.l A0, -(A7)
-  1880 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  1888 - 01050F00 - move.l D0, -(A7)
-  1892 - 412F0000000001CC - jsr @460
-  1900 - 01000100 - move.l D0, D1
-  1904 - 0140F000 - move.l (A7)+, D0
-  1908 - 0241F800 - movea.l (A7)+, A0
-  1912 - 412F000000000068 - jsr @104
-  1920 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  1928 - 1020000000000001 - add.l #1, D0
-  1936 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
-  1944 - 402F000000000730 - jmp @1840
+  1848 - 0160E100FFFFFFF4 - move.l -12(A6), D1
+  1856 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  1864 - 14000100 - cmp.l D0, D1
+  1868 - 552F0000000007A8 - bge @1960
+  1876 - 0261E800FFFFFFFC - movea.l -4(A6), A0
+  1884 - 01158F00 - move.l A0, -(A7)
+  1888 - 0160E000FFFFFFF4 - move.l -12(A6), D0
+  1896 - 01050F00 - move.l D0, -(A7)
+  1900 - 412F0000000001D4 - jsr @468
+  1908 - 01000100 - move.l D0, D1
+  1912 - 0140F000 - move.l (A7)+, D0
+  1916 - 0241F800 - movea.l (A7)+, A0
+  1920 - 412F000000000070 - jsr @112
+  1928 - 0160E000FFFFFFF4 - move.l -12(A6), D0
+  1936 - 1020000000000001 - add.l #1, D0
+  1944 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
+  1952 - 402F000000000738 - jmp @1848
   ; wh_end_31:
-  1952 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  1960 - 01158F00 - move.l A0, -(A7)
-  1964 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  1972 - 0241F800 - movea.l (A7)+, A0
-  1976 - 412F0000000000A8 - jsr @168
-  1984 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  1992 - 01158F00 - move.l A0, -(A7)
-  1996 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  2004 - 01050F00 - move.l D0, -(A7)
-  2008 - 0140F000 - move.l (A7)+, D0
-  2012 - 0241F800 - movea.l (A7)+, A0
-  2016 - 412F000000000498 - jsr @1176
-  2024 - 0120000000000000 - move.l #0, D0
-  2032 - 01060E00FFFFFFF0 - move.l D0, -16(A6)
-  2040 - 0120000000000000 - move.l #0, D0
-  2048 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
+  1960 - 0261E800FFFFFFFC - movea.l -4(A6), A0
+  1968 - 01158F00 - move.l A0, -(A7)
+  1972 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  1980 - 0241F800 - movea.l (A7)+, A0
+  1984 - 412F0000000000B0 - jsr @176
+  1992 - 0261E800FFFFFFFC - movea.l -4(A6), A0
+  2000 - 01158F00 - move.l A0, -(A7)
+  2004 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  2012 - 01050F00 - move.l D0, -(A7)
+  2016 - 0140F000 - move.l (A7)+, D0
+  2020 - 0241F800 - movea.l (A7)+, A0
+  2024 - 412F0000000004A0 - jsr @1184
+  2032 - 0120000000000000 - move.l #0, D0
+  2040 - 01060E00FFFFFFF0 - move.l D0, -16(A6)
+  2048 - 0120000000000000 - move.l #0, D0
+  2056 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
   ; wh_top_32:
-  2056 - 0160E100FFFFFFF4 - move.l -12(A6), D1
-  2064 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  2072 - 14000100 - cmp.l D0, D1
-  2076 - 552F000000000884 - bge @2180
-  2084 - 0160E000FFFFFFF0 - move.l -16(A6), D0
-  2092 - 01050F00 - move.l D0, -(A7)
-  2096 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  2104 - 01158F00 - move.l A0, -(A7)
-  2108 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  2116 - 0241F800 - movea.l (A7)+, A0
-  2120 - 412F000000000028 - jsr @40
-  2128 - 0140F100 - move.l (A7)+, D1
-  2132 - 10000100 - add.l D0, D1
-  2136 - 01001000 - move.l D1, D0
-  2140 - 01060E00FFFFFFF0 - move.l D0, -16(A6)
-  2148 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  2156 - 1020000000000001 - add.l #1, D0
-  2164 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
-  2172 - 402F000000000808 - jmp @2056
+  2064 - 0160E100FFFFFFF4 - move.l -12(A6), D1
+  2072 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  2080 - 14000100 - cmp.l D0, D1
+  2084 - 552F00000000088C - bge @2188
+  2092 - 0160E000FFFFFFF0 - move.l -16(A6), D0
+  2100 - 01050F00 - move.l D0, -(A7)
+  2104 - 0261E800FFFFFFFC - movea.l -4(A6), A0
+  2112 - 01158F00 - move.l A0, -(A7)
+  2116 - 0160E000FFFFFFF4 - move.l -12(A6), D0
+  2124 - 0241F800 - movea.l (A7)+, A0
+  2128 - 412F000000000030 - jsr @48
+  2136 - 0140F100 - move.l (A7)+, D1
+  2140 - 10000100 - add.l D0, D1
+  2144 - 01001000 - move.l D1, D0
+  2148 - 01060E00FFFFFFF0 - move.l D0, -16(A6)
+  2156 - 0160E000FFFFFFF4 - move.l -12(A6), D0
+  2164 - 1020000000000001 - add.l #1, D0
+  2172 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
+  2180 - 402F000000000810 - jmp @2064
   ; wh_end_33:
-  2180 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  2188 - 1420000000000000 - cmp.l #0, D0
-  2196 - 542F0000000008C4 - ble @2244
-  2204 - 0160E000FFFFFFF0 - move.l -16(A6), D0
-  2212 - 01050F00 - move.l D0, -(A7)
-  2216 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  2224 - 0140F100 - move.l (A7)+, D1
-  2228 - 13000100 - div.l D0, D1
-  2232 - 01001000 - move.l D1, D0
-  2236 - 01060E00FFFFFFEC - move.l D0, -20(A6)
+  2188 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  2196 - 1420000000000000 - cmp.l #0, D0
+  2204 - 542F0000000008CC - ble @2252
+  2212 - 0160E000FFFFFFF0 - move.l -16(A6), D0
+  2220 - 01050F00 - move.l D0, -(A7)
+  2224 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  2232 - 0140F100 - move.l (A7)+, D1
+  2236 - 13000100 - div.l D0, D1
+  2240 - 01001000 - move.l D1, D0
+  2244 - 01060E00FFFFFFEC - move.l D0, -20(A6)
   ; else_34:
-  2244 - 0221080000000404 - movea.l #1028, A0
-  2252 - 412F0000000003F4 - jsr @1012
-  2260 - 0120000000000000 - move.l #0, D0
-  2268 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
+  2252 - 0221080000000404 - movea.l #1028, A0
+  2260 - 412F0000000003FC - jsr @1020
+  2268 - 0120000000000000 - move.l #0, D0
+  2276 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
   ; wh_top_36:
-  2276 - 0160E100FFFFFFF4 - move.l -12(A6), D1
-  2284 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  2292 - 14000100 - cmp.l D0, D1
-  2296 - 552F000000000984 - bge @2436
-  2304 - 0261E800FFFFFFFC - movea.l -4(A6), A0
-  2312 - 01158F00 - move.l A0, -(A7)
-  2316 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  2324 - 0241F800 - movea.l (A7)+, A0
-  2328 - 412F000000000028 - jsr @40
-  2336 - 412F0000000000B0 - jsr @176
-  2344 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  2352 - 01050F00 - move.l D0, -(A7)
-  2356 - 0160E000FFFFFFF8 - move.l -8(A6), D0
-  2364 - 1120000000000001 - sub.l #1, D0
-  2372 - 0140F100 - move.l (A7)+, D1
-  2376 - 14000100 - cmp.l D0, D1
-  2380 - 552F000000000964 - bge @2404
-  2388 - 0120000000000020 - move.l #32, D0
-  2396 - 412F000000000000 - jsr @0
+  2284 - 0160E100FFFFFFF4 - move.l -12(A6), D1
+  2292 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  2300 - 14000100 - cmp.l D0, D1
+  2304 - 552F00000000098C - bge @2444
+  2312 - 0261E800FFFFFFFC - movea.l -4(A6), A0
+  2320 - 01158F00 - move.l A0, -(A7)
+  2324 - 0160E000FFFFFFF4 - move.l -12(A6), D0
+  2332 - 0241F800 - movea.l (A7)+, A0
+  2336 - 412F000000000030 - jsr @48
+  2344 - 412F0000000000B8 - jsr @184
+  2352 - 0160E000FFFFFFF4 - move.l -12(A6), D0
+  2360 - 01050F00 - move.l D0, -(A7)
+  2364 - 0160E000FFFFFFF8 - move.l -8(A6), D0
+  2372 - 1120000000000001 - sub.l #1, D0
+  2380 - 0140F100 - move.l (A7)+, D1
+  2384 - 14000100 - cmp.l D0, D1
+  2388 - 552F00000000096C - bge @2412
+  2396 - 0120000000000020 - move.l #32, D0
+  2404 - 412F000000000008 - jsr @8
   ; else_38:
-  2404 - 0160E000FFFFFFF4 - move.l -12(A6), D0
-  2412 - 1020000000000001 - add.l #1, D0
-  2420 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
-  2428 - 402F0000000008E4 - jmp @2276
+  2412 - 0160E000FFFFFFF4 - move.l -12(A6), D0
+  2420 - 1020000000000001 - add.l #1, D0
+  2428 - 01060E00FFFFFFF4 - move.l D0, -12(A6)
+  2436 - 402F0000000008EC - jmp @2284
   ; wh_end_37:
-  2436 - 012000000000000A - move.l #10, D0
-  2444 - 412F000000000000 - jsr @0
-  2452 - 0221080000000428 - movea.l #1064, A0
-  2460 - 412F0000000003F4 - jsr @1012
-  2468 - 0160E000FFFFFFF0 - move.l -16(A6), D0
-  2476 - 412F0000000000B0 - jsr @176
-  2484 - 012000000000000A - move.l #10, D0
-  2492 - 412F000000000000 - jsr @0
-  2500 - 0221080000000440 - movea.l #1088, A0
-  2508 - 412F0000000003F4 - jsr @1012
-  2516 - 0160E000FFFFFFEC - move.l -20(A6), D0
-  2524 - 412F0000000000B0 - jsr @176
-  2532 - 012000000000000A - move.l #10, D0
-  2540 - 412F000000000000 - jsr @0
-  2548 - 611FE000 - unlk A6
-  2552 - FFFF0000 - halt
+  2444 - 012000000000000A - move.l #10, D0
+  2452 - 412F000000000008 - jsr @8
+  2460 - 0221080000000428 - movea.l #1064, A0
+  2468 - 412F0000000003FC - jsr @1020
+  2476 - 0160E000FFFFFFF0 - move.l -16(A6), D0
+  2484 - 412F0000000000B8 - jsr @184
+  2492 - 012000000000000A - move.l #10, D0
+  2500 - 412F000000000008 - jsr @8
+  2508 - 0221080000000440 - movea.l #1088, A0
+  2516 - 412F0000000003FC - jsr @1020
+  2524 - 0160E000FFFFFFEC - move.l -20(A6), D0
+  2532 - 412F0000000000B8 - jsr @184
+  2540 - 012000000000000A - move.l #10, D0
+  2548 - 412F000000000008 - jsr @8
+  2556 - 611FE000 - unlk A6
+  2560 - FFFF0000 - halt

@@ -462,25 +462,24 @@ def load_labels(path: str) -> dict[str, int]:
     return labels
 
 
-def locate_files(prog_name: str, search_dirs: list[str]) -> tuple[str, str, str]:
+def locate_files(prog_name: str, search_dirs: list[str]) -> tuple[str, str]:
     """
-    Найти .imem, .dmem, .labels для программы prog_name.
+    Найти .imem и .dmem для программы prog_name.
     search_dirs — список директорий для поиска (перебираются по очереди).
-    Возвращает (imem_path, dmem_path, labels_path).
+    Возвращает (imem_path, dmem_path).
+    Точка входа — всегда PC=0 (компилятор размещает там JMP main).
     """
     stem = os.path.splitext(os.path.basename(prog_name))[0]
     for d in search_dirs:
         imem = os.path.join(d, stem + ".imem")
         dmem = os.path.join(d, stem + ".dmem")
-        labels = os.path.join(d, stem + ".labels")
-        if os.path.exists(imem) and os.path.exists(dmem) and os.path.exists(labels):
-            return imem, dmem, labels
+        if os.path.exists(imem) and os.path.exists(dmem):
+            return imem, dmem
     # Если не нашли по директориям — попробовать как прямой путь/префикс
     imem = prog_name + ".imem"
     dmem = prog_name + ".dmem"
-    labels = prog_name + ".labels"
     if os.path.exists(imem):
-        return imem, dmem, labels
+        return imem, dmem
     raise FileNotFoundError(f"Не найдены файлы программы '{stem}' ни в одной из директорий: " + ", ".join(search_dirs))
 
 
@@ -503,8 +502,9 @@ DESCRIPTION = """\
 emulator.py — потактовый эмулятор M68k-inspired Harvard ISA (JavaLight / JL).
 
 Загружает бинарные файлы, созданные compiler.py, и исполняет программу.
-Файлы <prog>.imem, <prog>.dmem, <prog>.labels ищутся в директории --dir
+Файлы <prog>.imem и <prog>.dmem ищутся в директории --dir
 (по умолчанию совпадает с DEFAULT_OUT_DIR из config.py).
+Точка входа всегда PC=0: компилятор помещает там JMP main.
 """
 
 EPILOG = """\
@@ -539,7 +539,7 @@ EPILOG = """\
 Формат файлов (создаются compiler.py):
   <prog>.imem     бинарный образ памяти команд
   <prog>.dmem     бинарный образ памяти данных
-  <prog>.labels   таблица меток (адрес → имя)
+  <prog>.lst      листинг с таблицей меток в начале
 
 Константы (из config.py):
   IO_IN  = {io_in:#010x}   адрес порта ввода  в dmem
@@ -561,7 +561,7 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="<prog_name>",
         help=(
             "Имя программы (без расширения) или путь к ней. "
-            "Эмулятор ищет <prog_name>.imem / .dmem / .labels "
+            "Эмулятор ищет <prog_name>.imem / .dmem "
             "в директории --dir."
         ),
     )
@@ -594,7 +594,7 @@ def build_parser() -> argparse.ArgumentParser:
         "-d",
         metavar="DIR",
         default=DEFAULT_OUT_DIR,
-        help=(f"Директория, где искать .imem / .dmem / .labels " f"(по умолчанию: {DEFAULT_OUT_DIR!r} из config.py)."),
+        help=(f"Директория, где искать .imem / .dmem (по умолчанию: {DEFAULT_OUT_DIR!r} из config.py)."),
     )
 
     # ── Трассировка ───────────────────────────────────────────────────────
@@ -641,20 +641,20 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def run(target_code: str, target_data: str, target_labels: str, input_stream: str) -> None:
+def run(target_code: str, target_data: str, input_stream: str) -> None:
+    """Программный API для запуска из тестов и других модулей.
+    Точка входа — PC=0 (по адресу 0 компилятор размещает JMP main).
+    """
     try:
-        code = open(target_code, "rb").read()
-        data = open(target_data, "rb").read()
-        labels = load_labels(target_labels)
+        code   = open(target_code, "rb").read()
+        data   = open(target_data, "rb").read()
         tokens = tokens_from_file(input_stream)
-        start_pc = labels["main"]
-
     except OSError as e:
         print(f"Ошибка чтения файла: {e}", file=sys.stderr)
         sys.exit(1)
 
     cpu = CPU(code, data, tokens, True)
-    cpu.run(start_pc=start_pc)
+    cpu.run(start_pc=0)
     print("=== Вывод программы ===")
     print(cpu.output_str(), end="")
 
@@ -684,7 +684,7 @@ def main():
         search_dirs.insert(0, prog_dir)
 
     try:
-        imem_path, dmem_path, labels_path = locate_files(args.prog_name, search_dirs)
+        imem_path, dmem_path = locate_files(args.prog_name, search_dirs)
     except FileNotFoundError as e:
         print(f"Ошибка: {e}", file=sys.stderr)
         sys.exit(1)
@@ -693,16 +693,13 @@ def main():
     try:
         code = open(imem_path, "rb").read()
         data = open(dmem_path, "rb").read()
-        labels = load_labels(labels_path)
     except OSError as e:
         print(f"Ошибка чтения файла: {e}", file=sys.stderr)
         sys.exit(1)
 
-    # ── Получить точку входа ──────────────────────────────────────────────
-    if "main" not in labels:
-        print("Ошибка: метка 'main' не найдена в .labels файле.", file=sys.stderr)
-        sys.exit(1)
-    start_pc = labels["main"]
+    # ── Точка входа — всегда PC=0 ─────────────────────────────────────────
+    # Компилятор размещает по адресу 0 инструкцию JMP main.
+    start_pc = 0
 
     # ── Подготовить входные токены ────────────────────────────────────────
     stdin_source = None  # None = ввод только из буфера токенов
@@ -728,7 +725,7 @@ def main():
     print(f"[EMU] Программа : {stem}")
     print(f"[EMU] imem      : {imem_path}  ({len(code)} байт)")
     print(f"[EMU] dmem      : {dmem_path}  ({len(data)} байт)")
-    print(f"[EMU] Вход main : {start_pc}")
+    print(f"[EMU] Точка входа: PC=0 (JMP main)")
     if stdin_source is None:
         print(f"[EMU] Ввод      : {len(tokens)} токен(ов) (буфер)")
     else:

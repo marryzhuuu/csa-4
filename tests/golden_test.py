@@ -73,7 +73,7 @@ def test_compiler_and_emulator(golden, caplog):
         with contextlib.redirect_stdout(io.StringIO()) as stdout:
             compiler.run(source, tmpdirname)
             print("============================================================")
-            emulator.run(target_code, target_data, target_labels, input_stream)
+            emulator.run(target_code, target_data, input_stream)
 
         # Выходные данные также считываем в переменные.
         with open(target_code, "rb") as file:

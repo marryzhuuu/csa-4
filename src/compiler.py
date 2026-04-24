@@ -8,7 +8,6 @@ compiler.py  —  компилятор языка JavaLight (JL) → M68k-inspir
 Создаёт файлы:
     <output_dir>/<stem>.imem    — бинарный образ памяти команд
     <output_dir>/<stem>.dmem    — бинарный образ памяти данных
-    <output_dir>/<stem>.labels  — таблица меток
     <output_dir>/<stem>.lst     — дизассемблерный листинг
 """
 
@@ -1289,6 +1288,11 @@ class CodeGen:
         needed_rt = {n for n in reached if n.startswith("__rt_")}
         needed_user = {n for n in reached if not n.startswith("__rt_")}
 
+        # Адрес 0: JMP main — точка входа всегда по нулевому адресу.
+        # Эмулятору достаточно стартовать с PC=0; файл меток не нужен.
+        self._label("__entry")
+        self._jmp("main")
+
         # Рантайм — только используемые функции
         self.emit_runtime(needed_rt)
 
@@ -2107,30 +2111,25 @@ def compile_file(src_path: str, out_dir: str):
     # Выходные файлы
     imem_path = os.path.join(out_dir, stem + ".imem")
     dmem_path = os.path.join(out_dir, stem + ".dmem")
-    labels_path = os.path.join(out_dir, stem + ".labels")
-    lst_path = os.path.join(out_dir, stem + ".lst")
+    lst_path  = os.path.join(out_dir, stem + ".lst")
 
     with open(imem_path, "wb") as f:
         f.write(code)
     with open(dmem_path, "wb") as f:
         f.write(data)
 
-    with open(labels_path, "w") as f:
-        for name, addr in sorted(cg.labels.items(), key=lambda x: x[1]):
-            f.write(f"{addr:6d}  {name}\n")
-
     with open(lst_path, "w") as f:
+        # Таблица меток выводится в начало листинга
+        f.write("; Таблица меток:\n")
+        for name, addr in sorted(cg.labels.items(), key=lambda x: x[1]):
+            f.write(f";   {addr:6d}  {name}\n")
+        f.write(";\n")
         f.write(cg.listing())
 
     print(f"imem:   {imem_path}  ({len(code)} байт)")
     print(f"dmem:   {dmem_path}  ({len(data)} байт)")
-    print(f"labels: {labels_path}")
     print(f"lst:    {lst_path}")
-
-    if "main" in cg.labels:
-        print(f"\nТочка входа main: {cg.labels['main']}")
-    else:
-        print("\n[!] Функция main не найдена", file=sys.stderr)
+    print(f"\nТочка входа: PC=0 → JMP main ({cg.labels.get('main', '?')})")
 
 
 HELP = """
@@ -2151,8 +2150,7 @@ compiler.py — компилятор языка JavaLight (JL) в бинарны
 Выходные файлы (имя берётся из <source.jl> без расширения):
   <stem>.imem          Бинарный образ памяти команд (instruction memory)
   <stem>.dmem          Бинарный образ памяти данных (data memory)
-  <stem>.labels        Таблица меток: адрес → имя функции/метки
-  <stem>.lst           Листинг дизассемблированного кода
+  <stem>.lst           Листинг кода (включает таблицу меток в начале)
   <stem>.ast           Абстрактное синтаксическое дерево (human-readable)
 
 Константы (из config.py):
