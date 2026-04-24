@@ -646,8 +646,8 @@ def run(target_code: str, target_data: str, input_stream: str) -> None:
     Точка входа — PC=0 (по адресу 0 компилятор размещает JMP main).
     """
     try:
-        code   = open(target_code, "rb").read()
-        data   = open(target_data, "rb").read()
+        code = open(target_code, "rb").read()
+        data = open(target_data, "rb").read()
         tokens = tokens_from_file(input_stream)
     except OSError as e:
         print(f"Ошибка чтения файла: {e}", file=sys.stderr)
@@ -725,7 +725,7 @@ def main():
     print(f"[EMU] Программа : {stem}")
     print(f"[EMU] imem      : {imem_path}  ({len(code)} байт)")
     print(f"[EMU] dmem      : {dmem_path}  ({len(data)} байт)")
-    print(f"[EMU] Точка входа: PC=0 (JMP main)")
+    print("[EMU] Точка входа: PC=0 (JMP main)")
     if stdin_source is None:
         print(f"[EMU] Ввод      : {len(tokens)} токен(ов) (буфер)")
     else:

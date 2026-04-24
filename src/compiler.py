@@ -2,6 +2,8 @@
 """
 compiler.py  —  компилятор языка JavaLight (JL) → M68k-inspired Harvard ISA
 
+Рантайм-библиотека вынесена в runtime.py (RuntimeEmitter).
+
 Использование:
     python compiler.py <source.jl> <output_dir>
 
@@ -17,6 +19,7 @@ import sys
 from dataclasses import dataclass
 
 from config import DEFAULT_OUT_DIR, IO_IN, IO_OUT
+from runtime import RuntimeEmitter, reachable_fns
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  ISA  (встроенная копия isa.py — компилятор самодостаточен)
@@ -904,15 +907,6 @@ class Parser:
 #  ГЕНЕРАТОР КОДА
 # ═══════════════════════════════════════════════════════════════════════════════
 
-BUILTINS = {
-    "read_char",
-    "write_char",
-    "str_len",
-    "str_get",
-    "str_set",
-    "str_set_len",
-}
-
 # Соглашение о вызовах:
 #   Аргументы:  первый int/bool → D0; второй → D1; третий → D2
 #               первый str (адрес) → A0; второй str → A1
@@ -945,99 +939,6 @@ class FnInfo:
         self.name = name
         self.params = params  # list of (name, type_name)
         self.ret_type = ret_type
-
-
-# Имена runtime-функций, которые каждая из публичных встроенных
-# может вызвать транзитивно (для анализа достижимости).
-RT_CALLS = {
-    "write_char": {"__rt_write_char"},
-    "read_char": {"__rt_read_char"},
-    "str_len": {"__rt_str_len"},
-    "str_get": {"__rt_str_get"},
-    "str_set": {"__rt_str_set"},
-    "str_set_len": {"__rt_str_set_len"},
-    # runtime helpers, используемые только внутри самой rt-библиотеки:
-    "__rt_print_str": {"__rt_write_char"},
-    "__rt_read_line": {"__rt_read_char"},
-}
-
-
-def collect_calls(node) -> set:
-    """Рекурсивно собрать все имена вызываемых функций в AST-узле."""
-    calls = set()
-    if isinstance(node, Call):
-        calls.add(node.name)
-        for a in node.args:
-            calls |= collect_calls(a)
-    elif isinstance(node, BinOp):
-        calls |= collect_calls(node.left)
-        calls |= collect_calls(node.right)
-    elif isinstance(node, UnOp):
-        calls |= collect_calls(node.operand)
-    elif isinstance(node, Assign):
-        calls |= collect_calls(node.value)
-    elif isinstance(node, ExprStmt):
-        calls |= collect_calls(node.expr)
-    elif isinstance(node, VarDecl) and node.init:
-        calls |= collect_calls(node.init)
-    elif isinstance(node, ReturnStmt) and node.value:
-        calls |= collect_calls(node.value)
-    elif isinstance(node, IfStmt):
-        calls |= collect_calls(node.cond)
-        calls |= collect_calls(node.then_)
-        if node.else_:
-            calls |= collect_calls(node.else_)
-    elif isinstance(node, WhileStmt):
-        calls |= collect_calls(node.cond)
-        calls |= collect_calls(node.body)
-    elif isinstance(node, ForStmt):
-        if node.init:
-            calls |= collect_calls(node.init)
-        if node.cond:
-            calls |= collect_calls(node.cond)
-        if node.step:
-            calls |= collect_calls(node.step)
-        calls |= collect_calls(node.body)
-    elif isinstance(node, Block):
-        for s in node.stmts:
-            calls |= collect_calls(s)
-    elif isinstance(node, FnDecl):
-        calls |= collect_calls(node.body)
-    elif isinstance(node, Program):
-        for d in node.decls:
-            calls |= collect_calls(d)
-    return calls
-
-
-def reachable_fns(prog: Program) -> set:
-    """
-    Вернуть множество всех достижимых имён функций от main
-    (пользовательских + runtime).
-    """
-    # Собрать все пользовательские функции: имя → множество вызовов внутри неё
-    user_fn_calls: dict[str, set] = {}
-    for d in prog.decls:
-        if isinstance(d, FnDecl):
-            user_fn_calls[d.name] = collect_calls(d.body)
-
-    # BFS от main
-    visited = set()
-    queue = ["main"]
-    while queue:
-        fn = queue.pop()
-        if fn in visited:
-            continue
-        visited.add(fn)
-        # Прямые вызовы из тела пользовательской функции
-        direct = user_fn_calls.get(fn, set())
-        for callee in direct:
-            if callee not in visited:
-                queue.append(callee)
-        # Транзитивные runtime-зависимости
-        for rt_callee in RT_CALLS.get(fn, set()):
-            if rt_callee not in visited:
-                queue.append(rt_callee)
-    return visited
 
 
 class CodeGen:
@@ -1137,144 +1038,7 @@ class CodeGen:
             raise CompileError(f"Неизвестная переменная: {name!r}")
         return info  # (offset, type, is_const)
 
-    # ── Встроенная рантайм-библиотека ─────────────────────────────────────────
-    # Генерируется один раз перед всеми пользовательскими функциями.
-
-    # ── Отдельные эмиттеры для каждой rt-функции ─────────────────────────────
-
-    def _emit_rt_write_char(self):
-        self._label("__rt_write_char")
-        self._emit(_ei(Op.MOVEA, Imm(IO_OUT), A(5)))
-        self._emit(_ei(Op.MOVE, D(0), Ind(5)))
-        self._emit(_rts())
-
-    def _emit_rt_read_char(self):
-        self._label("__rt_read_char")
-        self._emit(_ei(Op.MOVEA, Imm(IO_IN), A(5)))
-        self._emit(_ei(Op.MOVE, Ind(5), D(0)))
-        self._emit(_rts())
-
-    def _emit_rt_str_len(self):
-        self._label("__rt_str_len")
-        self._emit(_ei(Op.MOVE, Ind(0), D(0)))
-        self._emit(_rts())
-
-    def _emit_rt_str_get(self):
-        self._label("__rt_str_get")
-        self._emit(_link(FP, -8))
-        self._emit(_ei(Op.MOVE, D(1), Disp(FP, -4)))
-        self._emit(_ei(Op.MOVEA, A(0), A(1)))
-        self._emit(_ei(Op.ADD, Imm(4), A(1)))
-        self._emit(_ei(Op.MOVE, D(0), D(1)))
-        self._emit(_ei(Op.MUL, Imm(4), D(1)))
-        self._emit(_ei(Op.ADD, D(1), A(1)))
-        self._emit(_ei(Op.MOVE, Ind(1), D(0)))
-        self._emit(_ei(Op.MOVE, Disp(FP, -4), D(1)))
-        self._emit(_unlk(FP))
-        self._emit(_rts())
-
-    def _emit_rt_str_set(self):
-        self._label("__rt_str_set")
-        self._emit(_link(FP, -8))
-        self._emit(_ei(Op.MOVE, D(2), Disp(FP, -4)))
-        self._emit(_ei(Op.MOVEA, A(0), A(1)))
-        self._emit(_ei(Op.ADD, Imm(4), A(1)))
-        self._emit(_ei(Op.MOVE, D(0), D(2)))
-        self._emit(_ei(Op.MUL, Imm(4), D(2)))
-        self._emit(_ei(Op.ADD, D(2), A(1)))
-        self._emit(_ei(Op.MOVE, D(1), Ind(1)))
-        self._emit(_ei(Op.MOVE, Disp(FP, -4), D(2)))
-        self._emit(_unlk(FP))
-        self._emit(_rts())
-
-    def _emit_rt_str_set_len(self):
-        self._label("__rt_str_set_len")
-        self._emit(_ei(Op.MOVE, D(0), Ind(0)))
-        self._emit(_rts())
-
-    def _emit_rt_print_str(self):
-        self._label("__rt_print_str")
-        self._emit(_link(FP, -16))
-        self._emit(_ei(Op.MOVE, D(1), Disp(FP, -4)))
-        self._emit(_ei(Op.MOVE, D(2), Disp(FP, -8)))
-        self._emit(_ei(Op.MOVEA, A(0), A(1)))
-        self._emit(_ei(Op.MOVE, Post(1), D(1)))
-        self._emit(_ei(Op.MOVE, Imm(0), D(2)))
-        lp = self._lbl("ps_loop")
-        dn = self._lbl("ps_done")
-        self._label(lp)
-        self._emit(_ei(Op.CMP, D(1), D(2)))
-        self._branch(Op.BGE, dn)
-        self._emit(_ei(Op.MOVE, Post(1), D(0)))
-        self._jsr("__rt_write_char")
-        self._emit(_ei(Op.ADD, Imm(1), D(2)))
-        self._jmp(lp)
-        self._label(dn)
-        self._emit(_ei(Op.MOVE, Disp(FP, -4), D(1)))
-        self._emit(_ei(Op.MOVE, Disp(FP, -8), D(2)))
-        self._emit(_unlk(FP))
-        self._emit(_rts())
-
-    def _emit_rt_read_line(self):
-        self._label("__rt_read_line")
-        self._emit(_link(FP, -16))
-        self._emit(_ei(Op.MOVE, D(1), Disp(FP, -4)))
-        self._emit(_ei(Op.MOVE, D(2), Disp(FP, -8)))
-        self._emit(_ei(Op.MOVE, D(0), D(1)))
-        self._emit(_ei(Op.MOVEA, A(0), A(1)))
-        self._emit(_ei(Op.ADD, Imm(4), A(1)))
-        self._emit(_ei(Op.MOVE, Imm(0), D(2)))
-        rl = self._lbl("rl_loop")
-        rs = self._lbl("rl_store")
-        self._label(rl)
-        self._emit(_ei(Op.CMP, D(1), D(2)))
-        self._branch(Op.BGE, rs)
-        self._jsr("__rt_read_char")
-        self._emit(_ei(Op.CMP, Imm(0xFFFFFFFF), D(0)))
-        self._branch(Op.BEQ, rs)
-        self._emit(_ei(Op.CMP, Imm(10), D(0)))
-        self._branch(Op.BEQ, rs)
-        self._emit(_ei(Op.MOVE, D(0), Post(1)))
-        self._emit(_ei(Op.ADD, Imm(1), D(2)))
-        self._jmp(rl)
-        self._label(rs)
-        self._emit(_ei(Op.MOVE, D(2), Ind(0)))
-        self._emit(_ei(Op.MOVE, D(2), D(0)))
-        self._emit(_ei(Op.MOVE, Disp(FP, -4), D(1)))
-        self._emit(_ei(Op.MOVE, Disp(FP, -8), D(2)))
-        self._emit(_unlk(FP))
-        self._emit(_rts())
-
-    # Таблица: rt-имя → метод-эмиттер
-    _RT_EMITTERS = {
-        "__rt_write_char": "_emit_rt_write_char",
-        "__rt_read_char": "_emit_rt_read_char",
-        "__rt_str_len": "_emit_rt_str_len",
-        "__rt_str_get": "_emit_rt_str_get",
-        "__rt_str_set": "_emit_rt_str_set",
-        "__rt_str_set_len": "_emit_rt_str_set_len",
-        "__rt_print_str": "_emit_rt_print_str",
-        "__rt_read_line": "_emit_rt_read_line",
-    }
-
-    def emit_runtime(self, needed: set):
-        """Генерировать только те rt-функции, которые входят в needed."""
-        # Фиксированный порядок — чтобы адреса не прыгали между компиляциями
-        order = [
-            "__rt_write_char",
-            "__rt_read_char",
-            "__rt_str_len",
-            "__rt_str_get",
-            "__rt_str_set",
-            "__rt_str_set_len",
-            "__rt_print_str",
-            "__rt_read_line",
-        ]
-        for name in order:
-            if name in needed:
-                getattr(self, self._RT_EMITTERS[name])()
-
-    # ── Компиляция программы ─────────────────────────────────────────────────
+    # ── Компиляция программы ─────────────────────────────────────────────
 
     def compile_program(self, prog: Program):
         # Первый проход: собрать информацию о функциях
@@ -1293,8 +1057,12 @@ class CodeGen:
         self._label("__entry")
         self._jmp("main")
 
-        # Рантайм — только используемые функции
-        self.emit_runtime(needed_rt)
+        # Рантайм — только используемые функции.
+        # RuntimeEmitter из runtime.py получает self (CodeGen) и
+        # текущий модуль compiler как ISA-namespace (без циклического импорта).
+        import sys as _sys
+
+        RuntimeEmitter(self, _sys.modules[__name__]).emit(needed_rt)
 
         # Второй проход: только достижимые пользовательские функции
         for d in prog.decls:
@@ -2111,7 +1879,7 @@ def compile_file(src_path: str, out_dir: str):
     # Выходные файлы
     imem_path = os.path.join(out_dir, stem + ".imem")
     dmem_path = os.path.join(out_dir, stem + ".dmem")
-    lst_path  = os.path.join(out_dir, stem + ".lst")
+    lst_path = os.path.join(out_dir, stem + ".lst")
 
     with open(imem_path, "wb") as f:
         f.write(code)
