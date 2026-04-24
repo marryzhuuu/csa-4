@@ -1,5 +1,4 @@
 in_source: |
-  // ── Беззнаковое сравнение ─────────────────────────────────────────────────────
   fn ult(a: int, b: int) : int {
       var sa: int = 0;  var sb: int = 0;
       if (a < 0) { sa = 1; }
@@ -9,15 +8,12 @@ in_source: |
       return 0;
   }
 
-  // ── Беззнаковые части слова ───────────────────────────────────────────────────
-  // lo16: всегда корректен (% с коррекцией знака)
   fn lo16(x: int) : int {
       var r: int = x % 65536;
       if (r < 0) { r = r + 65536; }
       return r;
   }
 
-  // hi16: (x - lo16(x)) делится на 65536 без остатка; затем lo16 для беззнаковости
   fn hi16(x: int) : int {
       var l: int = lo16(x);
       var r: int = (x - l) / 65536;
@@ -26,13 +22,11 @@ in_source: |
       return r;
   }
 
-  // Байты через lo16/hi16 (0..255 каждый)
   fn byte0(x: int) : int { return lo16(x) % 256; }
   fn byte1(x: int) : int { return lo16(x) / 256; }
   fn byte2(x: int) : int { return hi16(x) % 256; }
   fn byte3(x: int) : int { return hi16(x) / 256; }
 
-  // ── Сложение ──────────────────────────────────────────────────────────────────
   fn dp_add_lo(ahi: int, alo: int, bhi: int, blo: int) : int {
       return alo + blo;
   }
@@ -41,7 +35,6 @@ in_source: |
       return ahi + bhi + carry;
   }
 
-  // ── Вычитание ─────────────────────────────────────────────────────────────────
   fn dp_sub_lo(ahi: int, alo: int, bhi: int, blo: int) : int {
       return alo - blo;
   }
@@ -50,7 +43,6 @@ in_source: |
       return ahi - bhi - borrow;
   }
 
-  // ── Умножение 32×32 → 64 ──────────────────────────────────────────────────────
   fn mul_accumulate(a: int, b: int, acc: str) : void {
       var a0: int = byte0(a);  var a1: int = byte1(a);
       var a2: int = byte2(a);  var a3: int = byte3(a);
@@ -123,11 +115,6 @@ in_source: |
       return hi;
   }
 
-  // ── Вывод десятичный ──────────────────────────────────────────────────────────
-  // dp_mod10(hi, lo): (hi*2^32 + lo_real) mod 10
-  //   rhi = |hi % 10|
-  //   lo_real mod 10 = (lo%10 + (lo<0 ? 6 : 0)) mod 10   [т.к. 2^32 mod 10 = 6]
-  //   total = (rhi*6 + lo_real_mod10) mod 10
   fn dp_mod10(hi: int, lo: int) : int {
       var rhi: int = hi % 10;
       if (rhi < 0) { rhi = rhi + 10; }
@@ -142,7 +129,6 @@ in_source: |
       return t;
   }
 
-  // floor-деление на 10 (округление к -∞)
   fn floor_div10(x: int) : int {
       var q: int = x / 10;
       var r: int = x % 10;
@@ -150,10 +136,6 @@ in_source: |
       return q;
   }
 
-  // dp_div10_lo(hi, lo): lo-часть (hi*2^32 + lo_real) / 10
-  //   = |hi%10| * 429496729 + floor((rhi*6 + lo_adj) / 10)
-  // При lo>=0: lo_adj = lo
-  // При lo<0:  lo_adj = lo+6, добавляем ещё 429496729  [2^32/10 целая часть]
   fn dp_div10_lo(hi: int, lo: int) : int {
       var rhi: int = hi % 10;
       if (rhi < 0) { rhi = rhi + 10; }
@@ -183,7 +165,6 @@ in_source: |
       }
   }
 
-  // ── Вывод hex ─────────────────────────────────────────────────────────────────
   fn print_nibble(n: int) : void {
       if (n < 10) { write_char(48 + n); }
       else        { write_char(55 + n); }
@@ -214,52 +195,42 @@ in_source: |
       write_char(48 + x % 10);
   }
 
-  // ── Главная программа ─────────────────────────────────────────────────────────
   fn main() : void {
       var ahi: int = 0;  var alo: int = 0;
       var bhi: int = 0;  var blo: int = 0;
       var rhi: int = 0;  var rlo: int = 0;
 
-      // ── Сложение ──────────────────────────────────────────────────────────
       print_str("=== 64-bit Addition ===\n");
 
-      // 2^32 + 2^32 = 2^33 = 8589934592
       ahi=1; alo=0; bhi=1; blo=0;
       rhi=dp_add_hi(ahi,alo,bhi,blo); rlo=dp_add_lo(ahi,alo,bhi,blo);
       print_str("2^32 + 2^32                = "); print_i64(rhi,rlo); print_str("\n");
 
-      // 0xFFFFFFFF + 1 = 2^32 (перенос из lo в hi)
       ahi=0; alo=-1; bhi=0; blo=1;
       rhi=dp_add_hi(ahi,alo,bhi,blo); rlo=dp_add_lo(ahi,alo,bhi,blo);
       print_str("0xFFFFFFFF + 1             = ");
       print_i64(rhi,rlo); print_str("  "); print_hex64(rhi,rlo); print_str("\n");
 
-      // INT64_MAX + 1 = 0x8000000000000000 (переполнение в знаковый минимум)
       ahi=2147483647; alo=-1; bhi=0; blo=1;
       rhi=dp_add_hi(ahi,alo,bhi,blo); rlo=dp_add_lo(ahi,alo,bhi,blo);
       print_str("INT64_MAX + 1              = "); print_hex64(rhi,rlo); print_str("\n");
 
-      // ── Вычитание ─────────────────────────────────────────────────────────
       print_str("\n=== 64-bit Subtraction ===\n");
 
-      // 2^32 - 1 = 4294967295 (заём из hi)
       ahi=1; alo=0; bhi=0; blo=1;
       rhi=dp_sub_hi(ahi,alo,bhi,blo); rlo=dp_sub_lo(ahi,alo,bhi,blo);
       print_str("2^32 - 1                   = ");
       print_i64(rhi,rlo); print_str("  "); print_hex64(rhi,rlo); print_str("\n");
 
-      // 2^33 - 2^32 = 2^32
       ahi=2; alo=0; bhi=1; blo=0;
       rhi=dp_sub_hi(ahi,alo,bhi,blo); rlo=dp_sub_lo(ahi,alo,bhi,blo);
       print_str("2^33 - 2^32                = "); print_i64(rhi,rlo); print_str("\n");
 
-      // 0 - 1 = -1
       ahi=0; alo=0; bhi=0; blo=1;
       rhi=dp_sub_hi(ahi,alo,bhi,blo); rlo=dp_sub_lo(ahi,alo,bhi,blo);
       print_str("0 - 1                      = ");
       print_i64(rhi,rlo); print_str("  "); print_hex64(rhi,rlo); print_str("\n");
 
-      // ── Умножение 32×32 → 64 ─────────────────────────────────────────────
       print_str("\n=== 64-bit Multiplication (32x32->64) ===\n");
 
       rhi=dp_mul_hi(100000,100000); rlo=dp_mul_lo(100000,100000);
@@ -283,10 +254,7 @@ in_source: |
       rhi=dp_mul_hi(999999999,999999999); rlo=dp_mul_lo(999999999,999999999);
       print_str("999999999^2                = "); print_i64(rhi,rlo); print_str("\n");
 
-      // ── Цепочка операций: (a+b)*c ────────────────────────────────────────
       print_str("\n=== Chain: (2^32 + 7) * 3 ===\n");
-      // A = 2^32 + 7 = (1, 7)
-      // A + A + A = 3*A = 3*2^32 + 21 = (3, 21)
       ahi=1; alo=7;
       var sahi: int = dp_add_hi(ahi,alo,ahi,alo);
       var salo: int = dp_add_lo(ahi,alo,ahi,alo);
@@ -295,7 +263,6 @@ in_source: |
       print_str("(2^32+7)*3 = "); print_i64(thi,tlo);
       print_str("  "); print_hex64(thi,tlo); print_str("\n");
 
-      // ── Степени двойки 2^0 .. 2^39 ───────────────────────────────────────
       print_str("\n=== Powers of 2: 2^0 .. 2^39 ===\n");
       ahi=0; alo=1;
       var k: int = 0;
