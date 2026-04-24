@@ -439,32 +439,57 @@ class InlineEmitter:
     """
 
     def __init__(self, cg, isa):
-        self._cg  = cg
+        self._cg = cg
         self._isa = isa
 
     # ── Делегирование к CodeGen ───────────────────────────────────────────────
 
-    def _emit(self, b):        self._cg._emit(b)
-    def _lbl(self, prefix):    return self._cg._lbl(prefix)
-    def _label(self, name):    self._cg._label(name)
-    def _branch(self, op, lbl): self._cg._branch(op, lbl)
-    def _jmp(self, lbl):       self._cg._jmp(lbl)
+    def _emit(self, b):
+        self._cg._emit(b)
+
+    def _lbl(self, prefix):
+        return self._cg._lbl(prefix)
+
+    def _label(self, name):
+        self._cg._label(name)
+
+    def _branch(self, op, lbl):
+        self._cg._branch(op, lbl)
+
+    def _jmp(self, lbl):
+        self._cg._jmp(lbl)
 
     # ── Доступ к ISA ──────────────────────────────────────────────────────────
 
     @property
-    def _Op(self):   return self._isa.Op
-    @property
-    def _ei(self):   return self._isa._ei
-    @property
-    def _SP(self):   return self._isa.SP
+    def _Op(self):
+        return self._isa.Op
 
-    def _Imm(self, v):      return self._isa.Imm(v)
-    def _D(self, n):        return self._isa.D(n)
-    def _A(self, n):        return self._isa.A(n)
-    def _Ind(self, n):      return self._isa.Ind(n)
-    def _Pre(self, n):      return self._isa.Pre(n)
-    def _Post(self, n):     return self._isa.Post(n)
+    @property
+    def _ei(self):
+        return self._isa._ei
+
+    @property
+    def _SP(self):
+        return self._isa.SP
+
+    def _Imm(self, v):
+        return self._isa.Imm(v)
+
+    def _D(self, n):
+        return self._isa.D(n)
+
+    def _A(self, n):
+        return self._isa.A(n)
+
+    def _Ind(self, n):
+        return self._isa.Ind(n)
+
+    def _Pre(self, n):
+        return self._isa.Pre(n)
+
+    def _Post(self, n):
+        return self._isa.Post(n)
 
     # ── Встроенные операции ───────────────────────────────────────────────────
 
@@ -472,13 +497,13 @@ class InlineEmitter:
         """D0 → порт вывода IO_OUT. 2 инструкции."""
         Op, ei = self._Op, self._ei
         self._emit(ei(Op.MOVEA, self._Imm(IO_OUT), self._A(5)))
-        self._emit(ei(Op.MOVE,  self._D(0),         self._Ind(5)))
+        self._emit(ei(Op.MOVE, self._D(0), self._Ind(5)))
 
     def read_char(self):
         """Порт ввода IO_IN → D0. 2 инструкции."""
         Op, ei = self._Op, self._ei
         self._emit(ei(Op.MOVEA, self._Imm(IO_IN), self._A(5)))
-        self._emit(ei(Op.MOVE,  self._Ind(5),      self._D(0)))
+        self._emit(ei(Op.MOVE, self._Ind(5), self._D(0)))
 
     def str_len(self):
         """mem[A0] → D0. 1 инструкция."""
@@ -493,17 +518,17 @@ class InlineEmitter:
         """
         Op, ei, SP = self._Op, self._ei, self._SP
         # Сохранить D1
-        self._emit(ei(Op.MOVE, self._D(1), self._Pre(SP)))    # push D1
+        self._emit(ei(Op.MOVE, self._D(1), self._Pre(SP)))  # push D1
         # A1 = A0 + 4 + D0*4
-        self._emit(ei(Op.MOVEA, self._A(0),   self._A(1)))
-        self._emit(ei(Op.ADD,   self._Imm(4), self._A(1)))    # пропустить length-слово
-        self._emit(ei(Op.MOVE,  self._D(0),   self._D(1)))
-        self._emit(ei(Op.MUL,   self._Imm(4), self._D(1)))    # D1 = index * 4
-        self._emit(ei(Op.ADD,   self._D(1),   self._A(1)))    # A1 = &str[index]
+        self._emit(ei(Op.MOVEA, self._A(0), self._A(1)))
+        self._emit(ei(Op.ADD, self._Imm(4), self._A(1)))  # пропустить length-слово
+        self._emit(ei(Op.MOVE, self._D(0), self._D(1)))
+        self._emit(ei(Op.MUL, self._Imm(4), self._D(1)))  # D1 = index * 4
+        self._emit(ei(Op.ADD, self._D(1), self._A(1)))  # A1 = &str[index]
         # D0 = mem[A1]
         self._emit(ei(Op.MOVE, self._Ind(1), self._D(0)))
         # Восстановить D1
-        self._emit(ei(Op.MOVE, self._Post(SP), self._D(1)))   # pop D1
+        self._emit(ei(Op.MOVE, self._Post(SP), self._D(1)))  # pop D1
 
     def str_set(self):
         """
@@ -512,17 +537,17 @@ class InlineEmitter:
         """
         Op, ei, SP = self._Op, self._ei, self._SP
         # Сохранить D2
-        self._emit(ei(Op.MOVE, self._D(2), self._Pre(SP)))    # push D2
+        self._emit(ei(Op.MOVE, self._D(2), self._Pre(SP)))  # push D2
         # A1 = A0 + 4 + D0*4
-        self._emit(ei(Op.MOVEA, self._A(0),   self._A(1)))
-        self._emit(ei(Op.ADD,   self._Imm(4), self._A(1)))
-        self._emit(ei(Op.MOVE,  self._D(0),   self._D(2)))
-        self._emit(ei(Op.MUL,   self._Imm(4), self._D(2)))    # D2 = index * 4
-        self._emit(ei(Op.ADD,   self._D(2),   self._A(1)))    # A1 = &str[index]
+        self._emit(ei(Op.MOVEA, self._A(0), self._A(1)))
+        self._emit(ei(Op.ADD, self._Imm(4), self._A(1)))
+        self._emit(ei(Op.MOVE, self._D(0), self._D(2)))
+        self._emit(ei(Op.MUL, self._Imm(4), self._D(2)))  # D2 = index * 4
+        self._emit(ei(Op.ADD, self._D(2), self._A(1)))  # A1 = &str[index]
         # mem[A1] = D1
         self._emit(ei(Op.MOVE, self._D(1), self._Ind(1)))
         # Восстановить D2
-        self._emit(ei(Op.MOVE, self._Post(SP), self._D(2)))   # pop D2
+        self._emit(ei(Op.MOVE, self._Post(SP), self._D(2)))  # pop D2
 
     def str_set_len(self):
         """mem[A0] = D0. 1 инструкция."""

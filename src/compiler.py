@@ -19,7 +19,7 @@ import sys
 from dataclasses import dataclass
 
 from config import DEFAULT_OUT_DIR, IO_IN, IO_OUT
-from runtime import RuntimeEmitter, InlineEmitter, reachable_fns
+from runtime import InlineEmitter, RuntimeEmitter, reachable_fns
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  ISA  (встроенная копия isa.py — компилятор самодостаточен)
@@ -1068,6 +1068,7 @@ class CodeGen:
         # В inline-режиме (self.inline=True) __rt_* не нужны: тело builtin
         # вставляется прямо на месте каждого вызова через InlineEmitter.
         import sys as _sys
+
         if not self.inline:
             RuntimeEmitter(self, _sys.modules[__name__]).emit(needed_rt)
 
@@ -1626,6 +1627,7 @@ class CodeGen:
         # операции прямо на месте — без JSR, LINK, UNLK, RTS.
         # Подготовка аргументов в регистры одинакова для обоих режимов.
         import sys as _sys
+
         _ie = InlineEmitter(self, _sys.modules[__name__]) if self.inline else None
 
         if name == "read_char":
@@ -1638,7 +1640,7 @@ class CodeGen:
         if name == "write_char":
             if len(call.args) != 1:
                 raise CompileError("write_char требует 1 аргумент")
-            self.compile_expr(call.args[0])    # D0 = символ
+            self.compile_expr(call.args[0])  # D0 = символ
             if self.inline:
                 _ie.write_char()
             else:
@@ -1646,7 +1648,7 @@ class CodeGen:
             return "void"
 
         if name == "str_len":
-            self.compile_expr(call.args[0])    # A0 = строка
+            self.compile_expr(call.args[0])  # A0 = строка
             if self.inline:
                 _ie.str_len()
             else:
@@ -1655,37 +1657,37 @@ class CodeGen:
 
         if name == "str_get":
             # Подготовка аргументов: A0=строка, D0=индекс
-            self.compile_expr(call.args[0])              # A0 = s
-            self._emit(_ei(Op.MOVE, A(0), Pre(SP)))      # push A0
-            self.compile_expr(call.args[1])              # D0 = i
-            self._emit(_ei(Op.MOVEA, Post(SP), A(0)))    # pop A0
+            self.compile_expr(call.args[0])  # A0 = s
+            self._emit(_ei(Op.MOVE, A(0), Pre(SP)))  # push A0
+            self.compile_expr(call.args[1])  # D0 = i
+            self._emit(_ei(Op.MOVEA, Post(SP), A(0)))  # pop A0
             if self.inline:
-                _ie.str_get()       # scratch: A1, D1 (D1 сохраняется/восстанавливается)
+                _ie.str_get()  # scratch: A1, D1 (D1 сохраняется/восстанавливается)
             else:
                 self._jsr("__rt_str_get")
             return "int"
 
         if name == "str_set":
             # Подготовка аргументов: A0=строка, D0=индекс, D1=символ
-            self.compile_expr(call.args[0])              # A0 = s
-            self._emit(_ei(Op.MOVE, A(0), Pre(SP)))      # push A0
-            self.compile_expr(call.args[1])              # D0 = i
-            self._emit(_ei(Op.MOVE, D(0), Pre(SP)))      # push D0
-            self.compile_expr(call.args[2])              # D0 = c
-            self._emit(_ei(Op.MOVE, D(0), D(1)))         # D1 = c
-            self._emit(_ei(Op.MOVE, Post(SP), D(0)))     # pop D0 = i
-            self._emit(_ei(Op.MOVEA, Post(SP), A(0)))    # pop A0 = s
+            self.compile_expr(call.args[0])  # A0 = s
+            self._emit(_ei(Op.MOVE, A(0), Pre(SP)))  # push A0
+            self.compile_expr(call.args[1])  # D0 = i
+            self._emit(_ei(Op.MOVE, D(0), Pre(SP)))  # push D0
+            self.compile_expr(call.args[2])  # D0 = c
+            self._emit(_ei(Op.MOVE, D(0), D(1)))  # D1 = c
+            self._emit(_ei(Op.MOVE, Post(SP), D(0)))  # pop D0 = i
+            self._emit(_ei(Op.MOVEA, Post(SP), A(0)))  # pop A0 = s
             if self.inline:
-                _ie.str_set()       # scratch: A1, D2 (D2 сохраняется/восстанавливается)
+                _ie.str_set()  # scratch: A1, D2 (D2 сохраняется/восстанавливается)
             else:
                 self._jsr("__rt_str_set")
             return "void"
 
         if name == "str_set_len":
-            self.compile_expr(call.args[0])              # A0 = s
-            self._emit(_ei(Op.MOVE, A(0), Pre(SP)))      # push A0
-            self.compile_expr(call.args[1])              # D0 = n
-            self._emit(_ei(Op.MOVEA, Post(SP), A(0)))    # pop A0
+            self.compile_expr(call.args[0])  # A0 = s
+            self._emit(_ei(Op.MOVE, A(0), Pre(SP)))  # push A0
+            self.compile_expr(call.args[1])  # D0 = n
+            self._emit(_ei(Op.MOVEA, Post(SP), A(0)))  # pop A0
             if self.inline:
                 _ie.str_set_len()
             else:
@@ -1747,7 +1749,7 @@ class CodeGen:
         #   mnem : 28 символов (самые длинные мнемоники ~24 символа + запас)
         # Метки выводятся справа от мнемоники в единой выровненной колонке.
         ADDR_W = 6
-        HEX_W  = 32
+        HEX_W = 32
         MNEM_W = 28
 
         out = StringIO()
@@ -1770,12 +1772,7 @@ class CodeGen:
             # Метки справа от мнемоники через "; ", или пусто
             lbl_str = ("; " + ", ".join(lbls)) if lbls else ""
 
-            out.write(
-                f"{offset:{ADDR_W}d}"
-                f"  {hx:<{HEX_W}}"
-                f"  {mnem:<{MNEM_W}}"
-                f"{lbl_str}\n"
-            )
+            out.write(f"{offset:{ADDR_W}d}" f"  {hx:<{HEX_W}}" f"  {mnem:<{MNEM_W}}" f"{lbl_str}\n")
             offset += size
 
         return out.getvalue()
@@ -2009,7 +2006,7 @@ def main():
         sys.exit(0 if args and args[0] in ("-h", "--help") else 1)
 
     # Разобрать аргументы: [--inline] <source.jl> [output_dir]
-    inline  = False
+    inline = False
     positional = []
     for arg in args:
         if arg == "--inline":
@@ -2027,7 +2024,7 @@ def main():
         sys.exit(1)
 
     src_path = positional[0]
-    out_dir  = positional[1] if len(positional) == 2 else DEFAULT_OUT_DIR
+    out_dir = positional[1] if len(positional) == 2 else DEFAULT_OUT_DIR
     compile_file(src_path, out_dir, inline=inline)
 
 
