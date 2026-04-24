@@ -336,6 +336,7 @@ out_log: |
 
 out_stdout: |
   AST:    <tmpdir>/prog.ast
+  Режим: call
   imem:   <tmpdir>/prog.imem  (2564 байт)
   dmem:   <tmpdir>/prog.dmem  (1112 байт)
   lst:    <tmpdir>/prog.lst

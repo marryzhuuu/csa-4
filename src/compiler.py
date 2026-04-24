@@ -19,7 +19,7 @@ import sys
 from dataclasses import dataclass
 
 from config import DEFAULT_OUT_DIR, IO_IN, IO_OUT
-from runtime import RuntimeEmitter, reachable_fns
+from runtime import RuntimeEmitter, InlineEmitter, reachable_fns
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  ISA  (встроенная копия isa.py — компилятор самодостаточен)
@@ -942,7 +942,14 @@ class FnInfo:
 
 
 class CodeGen:
-    def __init__(self):
+    def __init__(self, inline: bool = False):
+        # Режим генерации встроенных функций:
+        #   False (по умолчанию) — call-режим: __rt_* как отдельные процедуры,
+        #                          каждый вызов builtin транслируется в JSR.
+        #   True  (--inline)     — inline-режим: тело builtin вставляется прямо
+        #                          на месте вызова без JSR/LINK/UNLK/RTS.
+        self.inline = inline
+
         # Код
         self.code = bytearray()
         self.fixups = []  # (offset_in_code, label_name)
@@ -1057,12 +1064,12 @@ class CodeGen:
         self._label("__entry")
         self._jmp("main")
 
-        # Рантайм — только используемые функции.
-        # RuntimeEmitter из runtime.py получает self (CodeGen) и
-        # текущий модуль compiler как ISA-namespace (без циклического импорта).
+        # Рантайм — только в call-режиме генерируем __rt_* как отдельные процедуры.
+        # В inline-режиме (self.inline=True) __rt_* не нужны: тело builtin
+        # вставляется прямо на месте каждого вызова через InlineEmitter.
         import sys as _sys
-
-        RuntimeEmitter(self, _sys.modules[__name__]).emit(needed_rt)
+        if not self.inline:
+            RuntimeEmitter(self, _sys.modules[__name__]).emit(needed_rt)
 
         # Второй проход: только достижимые пользовательские функции
         for d in prog.decls:
@@ -1613,52 +1620,76 @@ class CodeGen:
         name = call.name
 
         # ── Встроенные функции ────────────────────────────────────────────
+        # В call-режиме (self.inline=False) каждый builtin транслируется
+        # в вызов JSR __rt_*.
+        # В inline-режиме (self.inline=True) InlineEmitter вставляет тело
+        # операции прямо на месте — без JSR, LINK, UNLK, RTS.
+        # Подготовка аргументов в регистры одинакова для обоих режимов.
+        import sys as _sys
+        _ie = InlineEmitter(self, _sys.modules[__name__]) if self.inline else None
+
         if name == "read_char":
-            self._jsr("__rt_read_char")
+            if self.inline:
+                _ie.read_char()
+            else:
+                self._jsr("__rt_read_char")
             return "int"
 
         if name == "write_char":
             if len(call.args) != 1:
                 raise CompileError("write_char требует 1 аргумент")
-            self.compile_expr(call.args[0])
-            self._jsr("__rt_write_char")
+            self.compile_expr(call.args[0])    # D0 = символ
+            if self.inline:
+                _ie.write_char()
+            else:
+                self._jsr("__rt_write_char")
             return "void"
 
         if name == "str_len":
-            self.compile_expr(call.args[0])  # A0 = строка
-            self._jsr("__rt_str_len")
+            self.compile_expr(call.args[0])    # A0 = строка
+            if self.inline:
+                _ie.str_len()
+            else:
+                self._jsr("__rt_str_len")
             return "int"
 
         if name == "str_get":
-            # str_get(s, i) → D0
-            # A0=s, D0=i
-            self.compile_expr(call.args[0])  # A0 = s
-            self._emit(_ei(Op.MOVE, A(0), Pre(SP)))  # push A0
-            self.compile_expr(call.args[1])  # D0 = i
-            self._emit(_ei(Op.MOVEA, Post(SP), A(0)))  # pop A0
-            self._jsr("__rt_str_get")
+            # Подготовка аргументов: A0=строка, D0=индекс
+            self.compile_expr(call.args[0])              # A0 = s
+            self._emit(_ei(Op.MOVE, A(0), Pre(SP)))      # push A0
+            self.compile_expr(call.args[1])              # D0 = i
+            self._emit(_ei(Op.MOVEA, Post(SP), A(0)))    # pop A0
+            if self.inline:
+                _ie.str_get()       # scratch: A1, D1 (D1 сохраняется/восстанавливается)
+            else:
+                self._jsr("__rt_str_get")
             return "int"
 
         if name == "str_set":
-            # str_set(s, i, c) → void
-            # A0=s, D0=i, D1=c
-            self.compile_expr(call.args[0])  # A0 = s
-            self._emit(_ei(Op.MOVE, A(0), Pre(SP)))  # push A0
-            self.compile_expr(call.args[1])  # D0 = i
-            self._emit(_ei(Op.MOVE, D(0), Pre(SP)))  # push D0
-            self.compile_expr(call.args[2])  # D0 = c
-            self._emit(_ei(Op.MOVE, D(0), D(1)))  # D1 = c
-            self._emit(_ei(Op.MOVE, Post(SP), D(0)))  # pop D0 = i
-            self._emit(_ei(Op.MOVEA, Post(SP), A(0)))  # pop A0 = s
-            self._jsr("__rt_str_set")
+            # Подготовка аргументов: A0=строка, D0=индекс, D1=символ
+            self.compile_expr(call.args[0])              # A0 = s
+            self._emit(_ei(Op.MOVE, A(0), Pre(SP)))      # push A0
+            self.compile_expr(call.args[1])              # D0 = i
+            self._emit(_ei(Op.MOVE, D(0), Pre(SP)))      # push D0
+            self.compile_expr(call.args[2])              # D0 = c
+            self._emit(_ei(Op.MOVE, D(0), D(1)))         # D1 = c
+            self._emit(_ei(Op.MOVE, Post(SP), D(0)))     # pop D0 = i
+            self._emit(_ei(Op.MOVEA, Post(SP), A(0)))    # pop A0 = s
+            if self.inline:
+                _ie.str_set()       # scratch: A1, D2 (D2 сохраняется/восстанавливается)
+            else:
+                self._jsr("__rt_str_set")
             return "void"
 
         if name == "str_set_len":
-            self.compile_expr(call.args[0])  # A0 = s
-            self._emit(_ei(Op.MOVE, A(0), Pre(SP)))  # push A0
-            self.compile_expr(call.args[1])  # D0 = n
-            self._emit(_ei(Op.MOVEA, Post(SP), A(0)))  # pop A0
-            self._jsr("__rt_str_set_len")
+            self.compile_expr(call.args[0])              # A0 = s
+            self._emit(_ei(Op.MOVE, A(0), Pre(SP)))      # push A0
+            self.compile_expr(call.args[1])              # D0 = n
+            self._emit(_ei(Op.MOVEA, Post(SP), A(0)))    # pop A0
+            if self.inline:
+                _ie.str_set_len()
+            else:
+                self._jsr("__rt_str_set_len")
             return "void"
 
         # ── Пользовательские функции ──────────────────────────────────────
@@ -1836,7 +1867,7 @@ def _decode(data, offset):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
-def compile_file(src_path: str, out_dir: str):
+def compile_file(src_path: str, out_dir: str, inline: bool = False):
     stem = os.path.splitext(os.path.basename(src_path))[0]
     os.makedirs(out_dir, exist_ok=True)
 
@@ -1867,7 +1898,7 @@ def compile_file(src_path: str, out_dir: str):
 
     # Кодогенерация
     try:
-        cg = CodeGen()
+        cg = CodeGen(inline=inline)
         cg.compile_program(ast)
     except CompileError as e:
         print(f"Ошибка компиляции: {e}", file=sys.stderr)
@@ -1894,6 +1925,8 @@ def compile_file(src_path: str, out_dir: str):
         f.write(";\n")
         f.write(cg.listing())
 
+    mode = "inline" if inline else "call"
+    print(f"Режим: {mode}")
     print(f"imem:   {imem_path}  ({len(code)} байт)")
     print(f"dmem:   {dmem_path}  ({len(data)} байт)")
     print(f"lst:    {lst_path}")
@@ -1913,6 +1946,10 @@ compiler.py — компилятор языка JavaLight (JL) в бинарны
 Необязательные аргументы:
   [output_dir]         Директория для выходных файлов
                        По умолчанию: {default_out!r}
+  --inline             Вставлять код встроенных функций (read_char, write_char,
+                       str_get и т.д.) прямо на месте вызова без JSR/LINK/RTS.
+                       Уменьшает imem для программ с редкими вызовами;
+                       увеличивает — для программ с частыми (напр. в цикле).
   -h, --help           Показать эту справку и выйти
 
 Выходные файлы (имя берётся из <source.jl> без расширения):
@@ -1933,8 +1970,8 @@ compiler.py — компилятор языка JavaLight (JL) в бинарны
 """
 
 
-def run(source_file: str, out_dir: str) -> None:
-    compile_file(source_file, out_dir)
+def run(source_file: str, out_dir: str, inline: bool = False) -> None:
+    compile_file(source_file, out_dir, inline=inline)
 
 
 def main():
@@ -1950,14 +1987,27 @@ def main():
         )
         sys.exit(0 if args and args[0] in ("-h", "--help") else 1)
 
-    if len(args) > 2:
-        print("Ошибка: слишком много аргументов.", file=sys.stderr)
+    # Разобрать аргументы: [--inline] <source.jl> [output_dir]
+    inline  = False
+    positional = []
+    for arg in args:
+        if arg == "--inline":
+            inline = True
+        elif arg.startswith("-"):
+            print(f"Ошибка: неизвестный ключ {arg!r}.", file=sys.stderr)
+            print("Запустите с -h для справки.", file=sys.stderr)
+            sys.exit(1)
+        else:
+            positional.append(arg)
+
+    if len(positional) == 0 or len(positional) > 2:
+        print("Ошибка: неверные аргументы.", file=sys.stderr)
         print("Запустите с -h для справки.", file=sys.stderr)
         sys.exit(1)
 
-    src_path = args[0]
-    out_dir = args[1] if len(args) == 2 else DEFAULT_OUT_DIR
-    compile_file(src_path, out_dir)
+    src_path = positional[0]
+    out_dir  = positional[1] if len(positional) == 2 else DEFAULT_OUT_DIR
+    compile_file(src_path, out_dir, inline=inline)
 
 
 if __name__ == "__main__":

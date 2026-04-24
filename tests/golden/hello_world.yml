@@ -221,6 +221,7 @@ out_log: |
   DEBUG   emulator:run             ... ещё 213 команд (используйте --trace-out для полного журнала)
 out_stdout: |
   AST:    <tmpdir>/prog.ast
+  Режим: call
   imem:   <tmpdir>/prog.imem  (292 байт)
   dmem:   <tmpdir>/prog.dmem  (60 байт)
   lst:    <tmpdir>/prog.lst
