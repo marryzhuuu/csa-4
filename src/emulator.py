@@ -1140,13 +1140,13 @@ def main():
         total = len(cpu.trace_log)
         limit = args.trace_limit
         shown = min(limit, total)
-        print(f"=== Трассировка (первые {shown} из {total} тактов) ===")
+        print(f"=== Трассировка (первые {shown} из {total} инструкций) ===")
         print(f"  {'addr':>5} | {'cycle':>7} | {'мнемоника':<36}| регистры")
         print("  " + "-" * 108)
         for line in cpu.trace_log[:limit]:
             print(" ", line)
         if total > limit:
-            print(f"  ... ещё {total - limit} тактов")
+            print(f"  ... ещё {total - limit} инструкций")
 
     if args.trace_out:
         try:
